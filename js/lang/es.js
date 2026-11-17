@@ -142,6 +142,9 @@ LANG.es = {
     "Your buddy walks around and visits the other walls": "Tu compañero pasea y visita las otras paredes",
     "Install": "Instalar",
     "To install: tap Share, then “Add to Home Screen”": "Para instalar: toca Compartir y luego «Añadir a pantalla de inicio»",
+    "Pick up your buddy and put it down anywhere. Hold it at the side of the screen to carry it to the next wall": "Coge a tu compañero y déjalo donde quieras. Mantenlo en el borde de la pantalla para llevarlo a la pared de al lado",
+    "Customize shows you what you are changing": "Personalizar te muestra lo que cambias",
+    "An Install button while the app isn’t installed, and a new icon": "Un botón Instalar mientras la app no esté instalada, y un icono nuevo",
   },
   tpl: {
     "Take “{1}” off your shelf? Your Google Doc is not touched.": "¿Quitar «{1}» de tu estantería? Tu Google Doc no se toca.",

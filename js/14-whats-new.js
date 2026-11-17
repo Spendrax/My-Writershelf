@@ -5,6 +5,14 @@
 
 const NEWS = [
   {
+    v: '1.2',
+    items: [
+      '\u270B Pick up your buddy and put it down anywhere. Hold it at the side of the screen to carry it to the next wall',
+      '\u{1F3A8} Customize shows you what you are changing',
+      '\u2B07 An Install button while the app isn\u2019t installed, and a new icon',
+    ],
+  },
+  {
     v: '1.1',
     items: [
       '\u{1F3A8} Customize the attic: string lights, walls, floor, rug and the view from the window',

@@ -142,6 +142,9 @@ LANG.ht = {
     "Your buddy walks around and visits the other walls": "Konpayon ou a ap mache epi vizite lòt mi yo",
     "Install": "Enstale",
     "To install: tap Share, then “Add to Home Screen”": "Pou enstale: peze Pataje, epi “Ajoute sou ekran akèy”",
+    "Pick up your buddy and put it down anywhere. Hold it at the side of the screen to carry it to the next wall": "Pran konpayon ou a epi depoze l kote ou vle. Kenbe l sou bò ekran an pou mennen l sou mi ki akote a",
+    "Customize shows you what you are changing": "Pèsonalize montre ou sa w ap chanje",
+    "An Install button while the app isn’t installed, and a new icon": "Yon bouton Enstale toutotan aplikasyon an poko enstale, ak yon nouvo ikòn",
   },
   tpl: {
     "Take “{1}” off your shelf? Your Google Doc is not touched.": "Retire “{1}” sou etajè ou? Google Doc ou a p ap touche.",

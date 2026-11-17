@@ -72,7 +72,25 @@ with sync_playwright() as p:
     # Customize: another animal and floor show right away and are kept
     pg.click('#btnLook'); pg.click('[data-k=kind] [data-v=fox]'); pg.click('[data-k=floor] [data-v="#7a5c3a"]'); pg.click('[data-k=rug] [data-v=none]')
     assert pg.evaluate("[pet.dataset.kind, !!pet.querySelector('.leg'), getComputedStyle(document.documentElement).getPropertyValue('--fl'), $('.rug').hidden, load('ws.set').look.kind]") == ['fox', True, '#7a5c3a', True, 'fox']
-    pg.click('#dlgLook [data-close]')
+    # the room shows what you're changing: lights at the top of the wall, the floor at the bottom
+    pg.click('[data-k=led] [data-v="#9fd6ff"]'); pg.wait_for_timeout(900); assert pg.evaluate("$('#view-attic').scrollTop") == 0
+    pg.click('[data-k=floor] [data-v="#4a3320"]'); pg.wait_for_timeout(900)
+    assert pg.evaluate("(v => v.scrollTop > 0 && v.scrollTop + v.clientHeight >= v.scrollHeight - 2)($('#view-attic'))")
+    pg.click('#dlgLook [data-close]'); pg.evaluate("$('#view-attic').scrollTo(0, 1e6)")
+    # pick the buddy up, carry it over the shelf, let go: it drops to the floor there, without talking
+    pg.evaluate('clearTimeout(petTimer); clearTimeout(say.t); pet.classList.remove("talk")')
+    r = pg.evaluate("(r => [r.x + 38, r.y + 40])(pet.getBoundingClientRect())")
+    m = pg.mouse; m.move(r[0], r[1]); m.down(); m.move(r[0] + 60, r[1] - 200, steps=6)
+    assert pg.evaluate("pet.classList.contains('held') && pet.getBoundingClientRect().y") < r[1] - 150
+    m.up(); pg.wait_for_timeout(500)
+    got = pg.evaluate("[Math.round(pet.getBoundingClientRect().x + 38), pet.style.transform, pet.classList.contains('talk'), pet.classList.contains('held')]")
+    assert abs(got[0] - (r[0] + 60)) < 3 and got[1].endswith(', 0px)') and got[2:] == [False, False], got
+    # held at the right side of the screen: carried to the Stats wall, and the room turns
+    r = pg.evaluate("(r => [r.x + 38, r.y + 40])(pet.getBoundingClientRect())")
+    m.move(r[0], r[1]); m.down(); m.move(380, r[1] - 60, steps=6); pg.wait_for_timeout(900); m.up(); pg.wait_for_timeout(600)
+    assert pg.evaluate("[where.wall, view, pet.parentElement === $('#view-stats .floor')]") == [1, 'stats', True]
+    pg.click('.dots [data-k="0"]'); pg.wait_for_timeout(500); pg.evaluate('petGo(0)')
+    pg.wait_for_function("where.wall === 0 && !pet.classList.contains('walk')", timeout=20000)
     # the buddy walks off the attic and comes in on the Stats wall's floor; the three floors are the same floor
     pg.evaluate('petGo(1)'); pg.wait_for_function("pet.parentElement === $('#view-stats .floor') && !pet.classList.contains('walk')", timeout=20000)
     assert pg.evaluate("$$('.floor').length") == 3

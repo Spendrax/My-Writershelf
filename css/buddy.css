@@ -9,8 +9,9 @@
   width: 76px;
   height: 78px;
   z-index: 5;
-  cursor: pointer;
-  /* moved along the floor by 16-buddy-moves.js with transform: translateX(…) */
+  cursor: grab;
+  touch-action: none; /* dragging it doesn't scroll the wall */
+  /* moved along the floor, and carried by your finger, by 16-buddy-moves.js with transform: translate(…) */
 }
 /* .pv turns the buddy to face the way it walks (the bubble stays readable) */
 .pv {
@@ -142,6 +143,18 @@
   to {
     translate: 0 -22px;
   }
+}
+
+/* picked up: above everything on the wall, legs dangling */
+.pet.held {
+  cursor: grabbing;
+  z-index: 9;
+}
+.pet.held .leg.a {
+  animation: step 0.5s ease-in-out infinite alternate;
+}
+.pet.held .leg.b {
+  animation: step 0.5s ease-in-out infinite alternate-reverse;
 }
 
 /* ---------- Speech bubble (on the side with more room) ---------- */
