@@ -8,7 +8,7 @@
 // this app's own Cloudflare helper (tools/cloudflare-helper.js). The token stays on this phone.
 
 // From this app's own Google Cloud project (see README → "Setting up Google"). Empty = not set up yet.
-const GOOGLE_CLIENT_ID = ''; // "OAuth client ID" (web application)
+const GOOGLE_CLIENT_ID = '901155885450-ij7clv4a6l799f76l9gkotuuu8j7rq6m.apps.googleusercontent.com'; // "OAuth client ID" (web application)
 const GOOGLE_API_KEY = 'AIzaSyBLCdzlbLmuFPZXI2g29nUajHabFvUUbmY'; // "API key", needed by Google's file picker
 const HELPER = 'https://my-writershelf.spendraxapp.workers.dev';
 const GOOGLE_SCOPES =

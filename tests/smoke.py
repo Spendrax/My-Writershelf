@@ -31,7 +31,7 @@ def page(b, locale='en-US', google=False):
     if google:
         # give the app a pretend Google set-up and sign-in
         def with_id(route):
-            body = open('js/02-google.js').read().replace("GOOGLE_CLIENT_ID = ''", "GOOGLE_CLIENT_ID = '123-x'")
+            body = open('js/02-google.js').read().replace("GOOGLE_CLIENT_ID = '", "GOOGLE_CLIENT_ID = '123-x'; '")
             route.fulfill(status=200, content_type='text/javascript', body=body)
         pg.route('**/js/02-google.js', with_id)
         pg.route(re.compile(r'googleapis\.com/(drive|upload|v1)|workers\.dev'), fake_google)
@@ -81,7 +81,7 @@ with sync_playwright() as p:
     pg.evaluate("window.asked=0; dispatchEvent(Object.assign(new Event('beforeinstallprompt'), {prompt(){asked++}, userChoice: Promise.resolve({outcome:'accepted'})}))")
     pg.click('#btnInstall'); pg.wait_for_timeout(100)
     assert pg.evaluate('asked') == 1 and pg.is_hidden('#btnInstall')
-    pg.click('#btnSettings'); assert pg.inner_text('#gStatus') == 'Not set up yet.'
+    pg.click('#btnSettings'); assert pg.is_visible('#gConnect')  # Google is set up, not connected yet
     assert not pg.errs, pg.errs
 
     # --- Google Docs: word counts read by themselves, Write here, a picked Doc
