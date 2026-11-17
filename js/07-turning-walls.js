@@ -24,6 +24,7 @@ function camSet(c) {
   });
 }
 function go(k, now) {
+  if (k !== WALLS[view]) matchWalls();
   document.body.classList.toggle('snap', !now);
   camSet(k);
   wallEls.forEach(([el, kk]) => {
@@ -64,6 +65,7 @@ addEventListener('pointermove', (e) => {
     }
     if (!(Math.abs(dx) > 14 && Math.abs(dx) > Math.abs(dy) * 1.3)) return;
     sw.on = true;
+    matchWalls();
     sw.x = e.clientX;
     clearTimeout(go.t);
     document.body.classList.remove('snap');
@@ -123,15 +125,14 @@ addEventListener('resize', () => camSet(cam));
 go(0, true);
 
 // The walls scroll together: at the top of one wall, the walls beside it are at their top too;
-// halfway down, they're halfway; at the bottom, at their bottom.
+// halfway down, they're halfway; at the bottom, at their bottom. So turning never jumps up or down.
+// Done while you scroll the wall you're looking at, and again just before the room turns (a wall may have
+// grown or shrunk since it was last scrolled).
+function matchWalls() {
+  const [lead] = wallEls.find(([, k]) => k === WALLS[view]);
+  const f = lead.scrollTop / Math.max(1, lead.scrollHeight - lead.clientHeight);
+  wallEls.forEach(([o]) => o !== lead && (o.scrollTop = f * (o.scrollHeight - o.clientHeight)));
+}
 wallEls.forEach(([el, k]) =>
-  el.addEventListener(
-    'scroll',
-    () => {
-      if (k !== WALLS[view]) return; // only the wall you're looking at leads
-      const f = el.scrollTop / Math.max(1, el.scrollHeight - el.clientHeight);
-      wallEls.forEach(([o]) => o !== el && (o.scrollTop = f * (o.scrollHeight - o.clientHeight)));
-    },
-    { passive: true },
-  ),
+  el.addEventListener('scroll', () => k === WALLS[view] && matchWalls(), { passive: true }), // only the wall you're looking at leads
 );

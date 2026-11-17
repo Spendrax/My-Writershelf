@@ -13,6 +13,11 @@
   touch-action: pan-y;
   backface-visibility: hidden;
   background: var(--wall); /* your wall colour (Customize) */
+  /* while the room turns, a wall's far side looks shorter: the wall carries on above it and the floor below it,
+     in the colours of the roof's shadow and of the floor's front edge, so no gap shows */
+  box-shadow:
+    0 -40vh 0 0 color-mix(in srgb, var(--wall) 60%, #000),
+    0 40vh 0 0 color-mix(in srgb, var(--fl) 55%, #000);
   /* the floor is always the last thing on a wall, at the bottom even when the wall is short */
   display: flex;
   flex-direction: column;

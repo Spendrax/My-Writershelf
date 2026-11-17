@@ -102,6 +102,16 @@ with sync_playwright() as p:
     pg.click('#btnSettings'); assert pg.is_visible('#gConnect')  # Google is set up, not connected yet
     assert not pg.errs, pg.errs
 
+    # the walls scroll together (top with top, bottom with bottom) and the floor is always at the bottom of the screen
+    pg.click('#dlgSet [data-close]')
+    pg.set_viewport_size({'width': 390, 'height': 560}); pg.wait_for_timeout(200)
+    for where_to, top in [('bottom', False), ('top', True)]:
+        pg.evaluate("(v => v.scrollTo(0, %s))($('#view-attic'))" % ('0' if top else 'v.scrollHeight')); pg.wait_for_timeout(200)
+        pg.click('.dots [data-k="1"]'); pg.wait_for_timeout(600)
+        v = pg.evaluate("(v => [v.scrollTop, v.scrollHeight - v.clientHeight, Math.round(v.querySelector('.floor').getBoundingClientRect().bottom)])($('#view-stats'))")
+        assert v[1] > 50 and (v[0] == 0 if top else v[0] >= v[1] - 2) and v[2] == 560, (where_to, v)
+        pg.click('.dots [data-k="0"]'); pg.wait_for_timeout(600)
+
     # --- Google Docs: word counts read by themselves, Write here, a picked Doc
     pg = page(b, google=True); pg.wait_for_timeout(2500)
     assert pg.evaluate('[byId("b1").words, wroteToday()]') == [150, 50], 'the Doc grew from 100 to 150 words'
