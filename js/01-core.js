@@ -4,7 +4,7 @@
 //   • a tiny event system: emit('change') after any edit, other files listen with on('change', …)
 //   • the word log: how many words you wrote each day, the daily goal and the streak
 //   • small helpers ($, esc, today, …) and spineHTML(), which draws one book on the shelf
-const VERSION = '1.0';
+const VERSION = '1.1';
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 
@@ -37,6 +37,11 @@ const store = (k, v) => {
 let books = load('ws.books', []);
 // log: words written each day ({ '2026-11-16': 420 }) · hit: the days the daily goal was reached
 const set = Object.assign({ pet: 'Inkwell', goal: 500, log: {}, hit: {} }, load('ws.set', {}));
+// look: what you chose in Customize (17-customize.js) — the attic's colours, the window, the animal and its fur
+set.look = Object.assign(
+  { led: '#ffc66b', wall: '#17110d', floor: '#4a3320', rug: '#9c3f33', sky: 'night', kind: 'cat', fur: '#e8964a' },
+  set.look,
+);
 
 const listeners = {};
 const on = (e, f) => (listeners[e] ??= []).push(f);

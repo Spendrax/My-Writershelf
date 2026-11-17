@@ -12,6 +12,7 @@
   overscroll-behavior: contain;
   touch-action: pan-y;
   backface-visibility: hidden;
+  background: var(--wall); /* your wall colour (Customize) */
   /* the floor is always the last thing on a wall, at the bottom even when the wall is short */
   display: flex;
   flex-direction: column;

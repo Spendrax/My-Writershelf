@@ -69,6 +69,13 @@ with sync_playwright() as p:
     assert pg.evaluate('books.length') == 0, 'a removed book stays removed when copies are merged'
     pg.evaluate("mergeFrom({books:[{id:'x',title:'From my other phone',words:10,updated:5}],settings:{log:{[today()]:900},hit:{}}})")
     assert pg.evaluate('[books.length, wroteToday()]') == [1, 900], 'merge keeps the highest count of the day'
+    # Customize: another animal and floor show right away and are kept
+    pg.click('#btnLook'); pg.click('[data-k=kind] [data-v=fox]'); pg.click('[data-k=floor] [data-v="#7a5c3a"]'); pg.click('[data-k=rug] [data-v=none]')
+    assert pg.evaluate("[pet.dataset.kind, !!pet.querySelector('.leg'), getComputedStyle(document.documentElement).getPropertyValue('--fl'), $('.rug').hidden, load('ws.set').look.kind]") == ['fox', True, '#7a5c3a', True, 'fox']
+    pg.click('#dlgLook [data-close]')
+    # the buddy walks off the attic and comes in on the Stats wall's floor; the three floors are the same floor
+    pg.evaluate('petGo(1)'); pg.wait_for_function("pet.parentElement === $('#view-stats .floor') && !pet.classList.contains('walk')", timeout=20000)
+    assert pg.evaluate("$$('.floor').length") == 3
     pg.click('#btnSettings'); assert pg.inner_text('#gStatus') == 'Not set up yet.'
     assert not pg.errs, pg.errs
 
@@ -93,7 +100,7 @@ with sync_playwright() as p:
     # --- French: nothing left in English on the three walls and the sheets
     pg = page(b, 'fr-CA'); add(pg, 'Mon roman', 100, 1000); pg.click('#btnSettings')
     text = pg.evaluate("document.body.textContent + [...document.querySelectorAll('[aria-label],[placeholder]')].map(e => e.getAttribute('aria-label') || e.placeholder).join(' ')")
-    left = re.findall(r'\b(Today|Goals?|Settings|Streak|Medals|Backup|words?|Save|Delete|Close|Language|book|day|Your)\b', text)
+    left = re.findall(r'\b(Today|Goals?|Customize|Settings|Streak|Medals|Backup|words?|Save|Delete|Close|Language|book|day|Your)\b', text)
     assert 'Aujourd’hui' in text and 'OBJECTIFS' in text and not left, left
     assert not pg.errs, pg.errs
     b.close()

@@ -1,9 +1,8 @@
 'use strict';
-// SETTINGS — daily goal, the buddy's name, the Google connection, and saving a backup file or loading one back.
+// SETTINGS — daily goal, the Google connection, and saving a backup file or loading one back.
 
 $('#btnSettings').onclick = () => {
   $('#sGoal').value = set.goal;
-  $('#sPet').value = set.pet;
   $('#ver').textContent = VERSION;
   drawGoogle();
   $('#dlgSet').showModal();
@@ -13,12 +12,6 @@ $('#sGoal').onchange = (e) => {
   saveSet();
   emit('change');
 };
-$('#sPet').onchange = (e) => {
-  set.pet = e.target.value.trim() || 'Inkwell';
-  saveSet();
-  emit('change');
-};
-
 /* ---------- Google ---------- */
 
 function drawGoogle() {

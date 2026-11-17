@@ -7,6 +7,11 @@
 
 :root {
   --led: #ffc66b;
+  /* set by Customize (17-customize.js): wall, floor, rug, the buddy's fur */
+  --wall: #17110d;
+  --fl: #4a3320;
+  --rug: #9c3f33;
+  --fur: #e8964a;
   --glow: color-mix(in srgb, var(--led) 45%, transparent);
   --ink: #f6ead9;
   --dim: #b8a48d;

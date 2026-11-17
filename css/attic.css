@@ -1,12 +1,12 @@
 /* THE ATTIC — the slanted roof with its string lights and round window, today's note pinned to the wall,
-   the shelf of book spines, the wooden floor and the buddy. */
+   the shelf of book spines and the wooden floor. */
 
 /* ---------- Roof: two beams meeting at the top, string lights under them ---------- */
 .roof {
   position: relative;
   height: 64px;
   overflow: hidden;
-  background: linear-gradient(#0d0906, transparent);
+  background: linear-gradient(#0006, transparent);
 }
 #view-attic .roof {
   height: 118px;
@@ -58,9 +58,24 @@
   background:
     radial-gradient(circle at 62% 36%, #fff6d6 0 7px, transparent 8px),
     linear-gradient(#131c3a, #2b3566);
-  box-shadow:
-    inset 0 0 10px #000a,
-    0 0 18px #6f86ff33;
+  box-shadow: inset 0 0 10px #000a;
+}
+/* the other views (Customize → Window) */
+[data-sky='dusk'] .porthole {
+  background:
+    radial-gradient(circle at 50% 78%, #ffe9a8 0 9px, transparent 10px),
+    linear-gradient(#3b2a6b, #e0704a 60%, #ffb35c);
+}
+[data-sky='day'] .porthole {
+  background:
+    radial-gradient(ellipse 12px 5px at 40% 62%, #fff 95%, transparent),
+    radial-gradient(circle at 68% 34%, #fff3b0 0 6px, transparent 7px),
+    linear-gradient(#5aa9e6, #b5dcf5);
+}
+[data-sky='rain'] .porthole {
+  background:
+    repeating-linear-gradient(105deg, transparent 0 5px, #ffffff55 5px 6px),
+    linear-gradient(#3c4653, #6b7785);
 }
 
 /* ---------- Today's note: a sheet of paper held by a pin ---------- */
@@ -199,131 +214,24 @@
   color: var(--dim);
 }
 
-/* ---------- Floor, rug and the buddy ---------- */
+/* ---------- Floor and rug: the same floor on the three walls, so it carries on when you turn ---------- */
 .floor {
   position: relative;
   margin-top: auto;
   height: 150px;
+  /* 6 planks per wall, so the plank lines meet at the corners */
   background:
-    repeating-linear-gradient(90deg, transparent 0 58px, #0005 58px 60px),
-    linear-gradient(#4a3320, #2a1c10);
+    repeating-linear-gradient(90deg, transparent 0 calc(100% / 6 - 2px), #0005 calc(100% / 6 - 2px) calc(100% / 6)),
+    linear-gradient(var(--fl), color-mix(in srgb, var(--fl) 55%, #000));
   border-top: 3px solid #1c130b;
 }
 .rug {
   position: absolute;
   left: 8%;
-  bottom: 62px;
+  bottom: 52px;
   width: 52%;
   height: 46px;
   border-radius: 50%;
-  background: radial-gradient(#9c3f33 0 40%, #c9a15a 41% 48%, #6e2b24 49%);
+  background: radial-gradient(var(--rug) 0 40%, #c9a15a 41% 48%, color-mix(in srgb, var(--rug) 70%, #000) 49%);
   opacity: 0.85;
-}
-.pet {
-  position: absolute;
-  left: 22%;
-  bottom: 78px;
-  width: 68px;
-  height: 52px;
-  cursor: pointer;
-}
-.cat i {
-  position: absolute;
-}
-.cat .body {
-  left: 6px;
-  bottom: 0;
-  width: 50px;
-  height: 32px;
-  border-radius: 50% 50% 40% 40%;
-  background: #e8964a;
-}
-.cat .head {
-  left: 32px;
-  bottom: 18px;
-  width: 32px;
-  height: 28px;
-  border-radius: 50%;
-  background:
-    radial-gradient(circle at 32% 50%, #2a1c10 0 2.5px, transparent 3px),
-    radial-gradient(circle at 68% 50%, #2a1c10 0 2.5px, transparent 3px),
-    #f0a35a;
-  transition: transform 0.3s;
-}
-.cat .head::before,
-.cat .head::after {
-  content: '';
-  position: absolute;
-  top: -5px;
-  border: 7px solid transparent;
-  border-top: 0;
-  border-bottom: 10px solid #f0a35a;
-}
-.cat .head::before {
-  left: 1px;
-}
-.cat .head::after {
-  right: 1px;
-}
-.cat .tail {
-  left: -6px;
-  bottom: 2px;
-  width: 24px;
-  height: 28px;
-  border: 6px solid #e8964a;
-  border-right-color: transparent;
-  border-top-color: transparent;
-  border-radius: 50%;
-  transform-origin: 80% 90%;
-  animation: wag 3s ease-in-out infinite;
-}
-@keyframes wag {
-  50% {
-    transform: rotate(-16deg);
-  }
-}
-/* asleep: eyes closed, no wagging */
-.pet.asleep .head {
-  background:
-    linear-gradient(#2a1c10, #2a1c10) 24% 54% / 7px 2px no-repeat,
-    linear-gradient(#2a1c10, #2a1c10) 76% 54% / 7px 2px no-repeat,
-    #f0a35a;
-  transform: translateY(6px);
-}
-.pet.asleep .tail {
-  animation: none;
-}
-.pet.sad .head {
-  transform: rotate(14deg) translateY(3px);
-}
-.pet.happy .tail {
-  animation-duration: 0.8s;
-}
-.pet.jump .cat {
-  display: block;
-  animation: jump 0.4s ease-out 4 alternate;
-}
-@keyframes jump {
-  to {
-    transform: translateY(-22px);
-  }
-}
-.bubble {
-  position: absolute;
-  left: 40px;
-  bottom: calc(100% + 6px);
-  width: max-content;
-  max-width: 220px;
-  padding: 7px 11px;
-  border-radius: 12px 12px 12px 2px;
-  background: #fff;
-  color: #1c130b;
-  font-size: 13px;
-  font-weight: 600;
-  opacity: 0;
-  transition: opacity 0.25s;
-  pointer-events: none;
-}
-.pet.talk .bubble {
-  opacity: 1;
 }

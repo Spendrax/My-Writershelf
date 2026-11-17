@@ -14,13 +14,14 @@
 <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/base.css">
 <link rel="stylesheet" href="css/attic.css">
+<link rel="stylesheet" href="css/buddy.css">
 <link rel="stylesheet" href="css/walls.css">
 <link rel="stylesheet" href="css/sheets.css">
 </head>
 <body>
 <header class="top">
   <h1 class="neon">WRITERSHELF</h1>
-  <div class="hbtns"><button id="btnSettings" class="icon" aria-label="Settings">⚙</button></div>
+  <div class="hbtns"><button id="btnLook" class="icon" aria-label="Customize">🎨</button><button id="btnSettings" class="icon" aria-label="Settings">⚙</button></div>
 </header>
 
 <main>
@@ -31,20 +32,20 @@
     <div id="shelf" class="shelf"></div>
     <div class="floor">
       <i class="rug"></i>
-      <div id="pet" class="pet" role="button" tabindex="0" aria-label="Your buddy">
-        <span class="bubble" id="bubble"></span>
-        <span class="cat"><i class="tail"></i><i class="body"></i><i class="head"></i></span>
-      </div>
+      <!-- the buddy: drawn by 08-buddy.js, walked around (and to the other walls' floors) by 16-buddy-moves.js -->
+      <div id="pet" class="pet" role="button" tabindex="0" aria-label="Your buddy"><span class="bubble" id="bubble"></span><div class="pv" id="petArt"></div></div>
     </div>
   </section>
 
   <section id="view-goals" class="view wall away">
     <div class="roof" aria-hidden="true"><i class="lights"></i></div>
     <div id="goalsBody" class="wall-body"></div>
+    <div class="floor"></div>
   </section>
   <section id="view-stats" class="view wall away">
     <div class="roof" aria-hidden="true"><i class="lights"></i></div>
     <div id="statsBody" class="wall-body"></div>
+    <div class="floor"></div>
   </section>
 </main>
 
@@ -93,6 +94,13 @@
   <p class="dim small">Your text is added at the end of the Doc. To change what’s already written, open Google Docs. Until it’s sent, your text is kept on this phone.</p>
 </dialog>
 
+<!-- Customize: a short sheet with no dark backdrop, so the attic stays in view while you choose -->
+<dialog id="dlgLook" class="sheet">
+  <div class="sheet-h"><h2>Customize</h2><button class="x" data-close aria-label="Close">✕</button></div>
+  <div id="cBody"></div>
+  <label>Your buddy’s name<input id="cPet" maxlength="24"></label>
+</dialog>
+
 <!-- What's new -->
 <dialog id="dlgNews" class="sheet">
   <div class="sheet-h"><h2>What’s new</h2><button class="x" data-close aria-label="Close">✕</button></div>
@@ -103,10 +111,7 @@
 <!-- Settings -->
 <dialog id="dlgSet" class="sheet">
   <div class="sheet-h"><h2>Settings</h2><button class="x" data-close aria-label="Close">✕</button></div>
-  <div class="two">
-    <label>Daily word goal<input id="sGoal" type="number" min="1" step="50" inputmode="numeric"></label>
-    <label>Your buddy’s name<input id="sPet" maxlength="24"></label>
-  </div>
+  <label>Daily word goal<input id="sGoal" type="number" min="1" step="50" inputmode="numeric"></label>
   <h3>Google</h3>
   <p class="dim small" id="gStatus"></p>
   <button class="btn primary wide" id="gConnect">Connect Google</button>
@@ -144,5 +149,7 @@
 <script src="js/13-install-update.js"></script>
 <script src="js/14-whats-new.js"></script>
 <script src="js/15-languages.js"></script>
+<script src="js/16-buddy-moves.js"></script>
+<script src="js/17-customize.js"></script>
 </body>
 </html>

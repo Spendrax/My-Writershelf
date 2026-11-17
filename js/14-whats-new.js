@@ -5,6 +5,14 @@
 
 const NEWS = [
   {
+    v: '1.1',
+    items: [
+      '\u{1F3A8} Customize the attic: string lights, walls, floor, rug and the view from the window',
+      '\u{1F43E} Choose your buddy: cat, dog, fox, bunny, bear or mouse, and its fur',
+      '\u{1F463} Your buddy walks around and visits the other walls',
+    ],
+  },
+  {
     v: '1.0',
     items: [
       '\u{1F4DA} Your books on an attic shelf: each spine fills up as you get closer to its word goal',

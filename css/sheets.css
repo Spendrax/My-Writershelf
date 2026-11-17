@@ -269,3 +269,36 @@ dialog.write[open] {
   resize: none;
   font: 16px/1.6 Georgia, serif;
 }
+
+/* ---------- Customize: a short sheet, no dark backdrop, so you see the attic change as you choose ---------- */
+#dlgLook {
+  height: 46vh;
+}
+/* while it's open the walls end above it, so the floor, the rug and your buddy stay in view */
+body.looking .view {
+  bottom: 46vh;
+}
+#dlgLook::backdrop {
+  background: transparent;
+  backdrop-filter: none;
+}
+.opt {
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--dim);
+}
+.swatches {
+  flex-wrap: wrap;
+}
+.swatches button {
+  border: 1px solid #ffffff33;
+  box-shadow: none;
+}
+/* "no rug" */
+.swatches button[data-v='none'] {
+  background: none;
+  font-size: 15px;
+}
+.seg button.on {
+  --sc: var(--led);
+}

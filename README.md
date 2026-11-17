@@ -9,7 +9,7 @@ Live at https://spendrax.github.io/My-Writershelf/
 - The scripts load in number order. `01-core.js` comes first and everything else uses it.
 - Files talk through small events: after any change to the books, `save()` sends `emit('change')`,
   and the shelf, the walls and the buddy redraw themselves with `on('change', …)`.
-- Books and settings are kept on the phone in `localStorage` (`ws.books`, `ws.set`); what you're typing in
+- Books and settings are kept on the phone in `localStorage` (`ws.books`, `ws.set`; `ws.set.look` is what you chose in Customize); what you're typing in
   "Write here" is in `ws.draft.<book id>` until Google has it.
 - Word counts: every time a book's count changes, the difference goes on today's log (`setWords` in `01-core.js`).
   That log drives the daily goal, the streak, the stats and the medals.
@@ -19,9 +19,10 @@ Live at https://spendrax.github.io/My-Writershelf/
 |---|---|
 | `index.html` | The page: the attic, the walls and every pop-up sheet |
 | `css/base.css` | Colours (the string-light colour is `--led`), fonts, top bar, form fields |
-| `css/attic.css` | Roof, string lights, round window, today's pinned note, the shelf and spines, floor, the buddy |
+| `css/attic.css` | Roof, string lights, round window and its views, today's pinned note, the shelf and spines, the floor (the same on the three walls) and the rug |
+| `css/buddy.css` | The buddy: its colours, blinking, tail, walking legs, moods, speech bubble |
 | `css/walls.css` | Turning the walls, the + button, wall dots, Update button, cards on the Goals and Stats walls |
-| `css/sheets.css` | Pop-up sheets, buttons, toast, the book card, the "Write here" sheet |
+| `css/sheets.css` | Pop-up sheets, buttons, toast, the book card, the "Write here" sheet, Customize |
 | `js/01-core.js` | Saving books and settings, events, helpers, the word log / daily goal / streak, drawing a spine |
 | `js/02-google.js` | Google sign-in and talking to Google. **The Google client ID and API key go here** |
 | `js/03-docs.js` | Picking Google Docs, reading their word counts (on open, on return, on ⟳) |
@@ -29,13 +30,15 @@ Live at https://spendrax.github.io/My-Writershelf/
 | `js/05-book-card.js` | The card shown when you tap a book |
 | `js/06-attic.js` | Today's note and the shelf |
 | `js/07-turning-walls.js` | Swiping round the hexagon: Goals ← Attic → Stats |
-| `js/08-buddy.js` | The cat: what it says, its moods |
+| `js/08-buddy.js` | The buddy: drawing each animal (the `ANIMALS` list), its moods, what it says |
 | `js/09-goals-stats.js` | The Goals wall and the Stats wall (medals are the `MEDALS` list) |
 | `js/10-write.js` | Write here: your text is added at the end of the Google Doc |
 | `js/11-settings-backup.js` | Settings, saving and loading a backup file |
 | `js/12-drive-backup.js` | Automatic Google Drive backup and syncing between devices |
 | `js/13-install-update.js` | Offline copy, "Update now" button, Install button |
 | `js/14-whats-new.js` | The "What's new" card: add an entry to `NEWS` for each important update |
+| `js/16-buddy-moves.js` | The buddy's walks along the floor and over to the other walls |
+| `js/17-customize.js` | The 🎨 sheet: string lights, walls, floor, rug, window, animal, fur (the `LOOKS` list) |
 | `js/15-languages.js`, `js/lang/` | The app in French, Spanish, Haitian Creole, Portuguese, German, Italian |
 | `tools/cloudflare-helper.js` | This app's own Cloudflare Worker: only the Google sign-in goes through it |
 | `sw.js` | The offline copy. Bump `V` on every release, and list any new file in `SHELL` |

@@ -24,8 +24,12 @@ function mergeFrom(remote) {
   // each day keeps its highest count: both devices read the same Docs, so adding them up would count twice
   for (const [day, n] of Object.entries(theirs.log || {})) set.log[day] = Math.max(set.log[day] || 0, +n || 0);
   Object.assign(set.hit, theirs.hit);
-  // a brand-new device also takes your daily goal and your buddy's name
-  if (wasEmpty) Object.assign(set, { goal: +theirs.goal || set.goal, pet: theirs.pet || set.pet });
+  // a brand-new device also takes your daily goal, your buddy's name and how you customized the attic
+  if (wasEmpty) {
+    Object.assign(set, { goal: +theirs.goal || set.goal, pet: theirs.pet || set.pet });
+    Object.assign(set.look, theirs.look);
+    emit('look');
+  }
   saveSet();
   save();
 }
