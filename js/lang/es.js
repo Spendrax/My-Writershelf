@@ -145,6 +145,11 @@ LANG.es = {
     "Pick up your buddy and put it down anywhere. Hold it at the side of the screen to carry it to the next wall": "Coge a tu compañero y déjalo donde quieras. Mantenlo en el borde de la pantalla para llevarlo a la pared de al lado",
     "Customize shows you what you are changing": "Personalizar te muestra lo que cambias",
     "An Install button while the app isn’t installed, and a new icon": "Un botón Instalar mientras la app no esté instalada, y un icono nuevo",
+    "Food bowl: call your buddy": "Cuenco: llama a tu compañero",
+    "Food? Coming": "¿Comida? Ya voy",
+    "Yum! Thanks": "¡Ñam! Gracias",
+    "Let go of your buddy above a shelf, today’s note or a card: it lands on it": "Suelta a tu compañero sobre una estantería, la nota del día o una tarjeta: se posa encima",
+    "Tap the food bowl on the floor: your buddy comes over to eat": "Toca el cuenco en el suelo: tu compañero viene a comer",
   },
   tpl: {
     "Take “{1}” off your shelf? Your Google Doc is not touched.": "¿Quitar «{1}» de tu estantería? Tu Google Doc no se toca.",

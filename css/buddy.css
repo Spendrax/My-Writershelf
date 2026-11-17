@@ -157,6 +157,53 @@
   animation: step 0.5s ease-in-out infinite alternate-reverse;
 }
 
+/* eating: head down into the bowl, again and again */
+.pet.eat .top {
+  animation: nom 0.35s ease-in-out infinite alternate;
+}
+@keyframes nom {
+  to {
+    transform: translate(2px, 3px) rotate(6deg);
+  }
+}
+
+/* ---------- The food bowl on each floor: tap it to fill it and call your buddy (16-buddy-moves.js) ---------- */
+.bowl {
+  position: absolute;
+  z-index: 4;
+  left: 63%; /* clear of the + button */
+  bottom: 52px;
+  width: 36px;
+  height: 15px;
+  border-radius: 3px 3px 15px 15px;
+  background: linear-gradient(#f3e6c8, #b08d5b);
+  box-shadow: 0 3px 4px #0007;
+}
+/* a bigger area to tap than the bowl itself */
+.bowl::after {
+  content: '';
+  position: absolute;
+  inset: -18px -12px -10px;
+}
+/* the food, heaped above the rim once it's filled */
+.bowl i {
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  top: -7px;
+  height: 10px;
+  border-radius: 50% 50% 0 0;
+  background:
+    radial-gradient(circle at 30% 60%, #c98a4a 0 2px, transparent 2.5px) 0 0 / 7px 6px,
+    #8a5a2b;
+  transform: scaleY(0);
+  transform-origin: bottom;
+  transition: transform 0.3s;
+}
+.bowl.full i {
+  transform: scaleY(1);
+}
+
 /* ---------- Speech bubble (on the side with more room) ---------- */
 .bubble {
   position: absolute;

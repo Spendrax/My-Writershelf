@@ -85,6 +85,20 @@ with sync_playwright() as p:
     m.up(); pg.wait_for_timeout(500)
     got = pg.evaluate("[Math.round(pet.getBoundingClientRect().x + 38), pet.style.transform, pet.classList.contains('talk'), pet.classList.contains('held')]")
     assert abs(got[0] - (r[0] + 60)) < 3 and got[1].endswith(', 0px)') and got[2:] == [False, False], got
+    # let go above a shelf board: it lands on the board, not the floor
+    pg.evaluate("$('#view-attic').scrollTo(0, 0)"); pg.wait_for_timeout(200)
+    board = pg.evaluate("$('.shelf').getBoundingClientRect().top + 150")
+    r = pg.evaluate("(r => [r.x + 38, r.y + 40])(pet.getBoundingClientRect())")
+    m.move(r[0], r[1]); m.down(); m.move(150, board - 120, steps=6); m.up(); pg.wait_for_timeout(800)
+    got = pg.evaluate("[where.y < 0, Math.round(pet.getBoundingClientRect().bottom - $('.shelf').getBoundingClientRect().top)]")
+    assert got[0] and abs(got[1] - 150) < 3, got
+    # tap the bowl: it hops down, walks over and eats, then the bowl is empty
+    pg.evaluate("clearTimeout(petTimer)"); pg.click('#view-attic .bowl', force=True)
+    assert pg.evaluate("$('#view-attic .bowl').classList.contains('full')")
+    pg.wait_for_function("pet.classList.contains('eat')", timeout=15000)
+    assert pg.evaluate("[where.y, Math.abs(pet.getBoundingClientRect().right - 16 - $('#view-attic .bowl').getBoundingClientRect().left) < 3]") == [0, True]
+    pg.wait_for_function("!$('#view-attic .bowl').classList.contains('full') && !pet.classList.contains('eat')", timeout=6000)
+    pg.evaluate("$('#view-attic').scrollTo(0, 1e6)"); pg.wait_for_timeout(200)
     # held at the right side of the screen: carried to the Stats wall, and the room turns
     r = pg.evaluate("(r => [r.x + 38, r.y + 40])(pet.getBoundingClientRect())")
     m.move(r[0], r[1]); m.down(); m.move(380, r[1] - 60, steps=6); pg.wait_for_timeout(900); m.up(); pg.wait_for_timeout(600)
@@ -135,6 +149,8 @@ with sync_playwright() as p:
     text = pg.evaluate("document.body.textContent + [...document.querySelectorAll('[aria-label],[placeholder]')].map(e => e.getAttribute('aria-label') || e.placeholder).join(' ')")
     left = re.findall(r'\b(Today|Goals?|Customize|Settings|Streak|Medals|Backup|words?|Save|Delete|Close|Language|book|day|Your)\b', text)
     assert 'Aujourd’hui' in text and 'OBJECTIFS' in text and not left, left
+    pg.click('#dlgSet [data-close]'); pg.click('#view-attic .bowl', force=True); pg.wait_for_timeout(200)
+    assert pg.inner_text('#bubble') == '🍖 À manger ? J’arrive!', pg.inner_text('#bubble')
     assert not pg.errs, pg.errs
     b.close()
 print('all good')

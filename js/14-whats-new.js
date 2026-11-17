@@ -5,6 +5,13 @@
 
 const NEWS = [
   {
+    v: '1.3',
+    items: [
+      '\u{1F43E} Let go of your buddy above a shelf, today\u2019s note or a card: it lands on it',
+      '\u{1F356} Tap the food bowl on the floor: your buddy comes over to eat',
+    ],
+  },
+  {
     v: '1.2',
     items: [
       '\u270B Pick up your buddy and put it down anywhere. Hold it at the side of the screen to carry it to the next wall',

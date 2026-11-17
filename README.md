@@ -37,7 +37,7 @@ Live at https://spendrax.github.io/My-Writershelf/
 | `js/12-drive-backup.js` | Automatic Google Drive backup and syncing between devices |
 | `js/13-install-update.js` | Offline copy, "Update now" button, Install button |
 | `js/14-whats-new.js` | The "What's new" card: add an entry to `NEWS` for each important update |
-| `js/16-buddy-moves.js` | The buddy's walks along the floor and over to the other walls; picking it up and carrying it |
+| `js/16-buddy-moves.js` | The buddy's walks along the floor and over to the other walls; picking it up, landing on things, the food bowls |
 | `js/17-customize.js` | The 🎨 sheet: string lights, walls, floor, rug, window, animal, fur (the `LOOKS` list); turning the room to what you're changing |
 | `js/15-languages.js`, `js/lang/` | The app in French, Spanish, Haitian Creole, Portuguese, German, Italian |
 | `tools/cloudflare-helper.js` | This app's own Cloudflare Worker: only the Google sign-in goes through it |

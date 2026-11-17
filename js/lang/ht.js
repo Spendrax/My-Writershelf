@@ -145,6 +145,11 @@ LANG.ht = {
     "Pick up your buddy and put it down anywhere. Hold it at the side of the screen to carry it to the next wall": "Pran konpayon ou a epi depoze l kote ou vle. Kenbe l sou bò ekran an pou mennen l sou mi ki akote a",
     "Customize shows you what you are changing": "Pèsonalize montre ou sa w ap chanje",
     "An Install button while the app isn’t installed, and a new icon": "Yon bouton Enstale toutotan aplikasyon an poko enstale, ak yon nouvo ikòn",
+    "Food bowl: call your buddy": "Bòl manje: rele konpayon ou",
+    "Food? Coming": "Manje? M ap vini",
+    "Yum! Thanks": "Miyam! Mèsi",
+    "Let go of your buddy above a shelf, today’s note or a card: it lands on it": "Lage konpayon ou anlè yon etajè, nòt jounen an oswa yon kat: li poze sou li",
+    "Tap the food bowl on the floor: your buddy comes over to eat": "Peze bòl manje a atè a: konpayon ou ap vin manje",
   },
   tpl: {
     "Take “{1}” off your shelf? Your Google Doc is not touched.": "Retire “{1}” sou etajè ou? Google Doc ou a p ap touche.",
