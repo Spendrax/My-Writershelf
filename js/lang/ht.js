@@ -150,6 +150,7 @@ LANG.ht = {
     "Yum! Thanks": "Miyam! Mèsi",
     "Let go of your buddy above a shelf, today’s note or a card: it lands on it": "Lage konpayon ou anlè yon etajè, nòt jounen an oswa yon kat: li poze sou li",
     "Tap the food bowl on the floor: your buddy comes over to eat": "Peze bòl manje a atè a: konpayon ou ap vin manje",
+    "Your buddy jumps up onto the shelves, today’s note and the cards on its own": "Konpayon ou a sote poukont li sou etajè yo, nòt jounen an ak kat yo",
   },
   tpl: {
     "Take “{1}” off your shelf? Your Google Doc is not touched.": "Retire “{1}” sou etajè ou? Google Doc ou a p ap touche.",

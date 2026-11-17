@@ -2,6 +2,7 @@
 // THE BUDDY'S WALKS — it wanders along the floor, rests, and now and then walks off the side of a wall
 // and comes in on the floor of the next one (the three floors are one floor going round the room).
 // It likes company: when you turn to another wall, it usually comes over. It stays put while asleep.
+//   • now and then it jumps up onto something on its own (a shelf board, today's note, a card)
 //   • pick it up and let go: it falls onto whatever is below it (a shelf board, today's note, a card, the floor)
 //   • held at the side of the screen, it's carried to the next wall
 //   • tap a food bowl on the floor: it comes over and eats
@@ -75,13 +76,14 @@ function petGo(k, x = somewhere(), then = restPet) {
 }
 
 // What next: up on something, it often stays a while; usually it joins you on the wall you're looking at;
-// sometimes it explores the wall next door
+// sometimes it jumps up onto something, or explores the wall next door
 function wanderPet() {
   if (pet.classList.contains('asleep')) return restPet(60e3);
   if (where.y && Math.random() < 0.5) return restPet();
   hopDown(() => {
     const yours = WALLS[view];
     if (yours !== where.wall && Math.random() < 0.7) return petGo(yours);
+    if (Math.random() < 0.3 && jumpUp()) return;
     const next = where.wall + (Math.random() < 0.5 ? -1 : 1);
     if (Math.random() < 0.15 && next >= FIRST && next <= LAST) return petGo(next);
     walkPet(somewhere(), restPet);
@@ -107,6 +109,34 @@ function surfaces() {
   const s = shelf.getBoundingClientRect();
   for (let top = s.top + 150; top < s.bottom - 10; top += 172) tops.push({ top, left: s.left + 12, right: s.right - 12 });
   return tops;
+}
+
+// Picks something on its wall it can reach (not too high, in view, wide enough), walks under it and jumps up.
+// Answers false if there's nothing to jump on.
+function jumpUp() {
+  const f = floorOf(where.wall).getBoundingClientRect();
+  const ground = f.bottom - PET_FLOOR;
+  const spots = surfaces().reduce((list, s) => {
+    const high = ground - s.top;
+    const fits = s.right - s.left > PET_W + 10 && s.top > 70 && s.top < innerHeight;
+    return fits && high > 40 && high < 360 ? list.concat(s) : list;
+  }, []);
+  if (!spots.length) return false;
+  const s = spots[Math.floor(Math.random() * spots.length)];
+  const x = s.left - f.left + 5 + Math.random() * (s.right - s.left - PET_W - 10);
+  const y = s.top - ground;
+  walkPet(x, () => {
+    // up a little past it, then down onto it
+    where.y = y;
+    pet.classList.add('leap');
+    moveTo(x, y - 24, 0.4, 'ease-out');
+    petTimer = setTimeout(() => {
+      moveTo(x, y, 0.15, 'ease-in');
+      pet.classList.remove('leap');
+      restPet();
+    }, 420);
+  });
+  return true;
 }
 
 // Falls straight down from where it is onto the first thing below its feet (or the floor)

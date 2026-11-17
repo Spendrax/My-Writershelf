@@ -5,6 +5,10 @@
 
 const NEWS = [
   {
+    v: '1.4',
+    items: ['\u{1F408} Your buddy jumps up onto the shelves, today\u2019s note and the cards on its own'],
+  },
+  {
     v: '1.3',
     items: [
       '\u{1F43E} Let go of your buddy above a shelf, today\u2019s note or a card: it lands on it',

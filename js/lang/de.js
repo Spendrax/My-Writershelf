@@ -150,6 +150,7 @@ LANG.de = {
     "Yum! Thanks": "Lecker! Danke",
     "Let go of your buddy above a shelf, today’s note or a card: it lands on it": "Lass deinen Begleiter über einem Regalbrett, der Tagesnotiz oder einer Karte los: Er landet darauf",
     "Tap the food bowl on the floor: your buddy comes over to eat": "Tippe auf den Napf am Boden: Dein Begleiter kommt zum Fressen",
+    "Your buddy jumps up onto the shelves, today’s note and the cards on its own": "Dein Begleiter springt von selbst auf die Regalbretter, die Tagesnotiz und die Karten",
   },
   tpl: {
     "Take “{1}” off your shelf? Your Google Doc is not touched.": "„{1}“ aus deinem Regal nehmen? Dein Google Doc bleibt unberührt.",

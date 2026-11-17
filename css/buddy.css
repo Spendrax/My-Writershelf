@@ -157,6 +157,14 @@
   animation: step 0.5s ease-in-out infinite alternate-reverse;
 }
 
+/* jumping up: front legs reach forward, back legs push off */
+.pet.leap .leg.a {
+  transform: rotate(-35deg);
+}
+.pet.leap .leg.b {
+  transform: rotate(35deg);
+}
+
 /* eating: head down into the bowl, again and again */
 .pet.eat .top {
   animation: nom 0.35s ease-in-out infinite alternate;

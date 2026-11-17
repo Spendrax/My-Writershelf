@@ -99,6 +99,13 @@ with sync_playwright() as p:
     assert pg.evaluate("[where.y, Math.abs(pet.getBoundingClientRect().right - 16 - $('#view-attic .bowl').getBoundingClientRect().left) < 3]") == [0, True]
     pg.wait_for_function("!$('#view-attic .bowl').classList.contains('full') && !pet.classList.contains('eat')", timeout=6000)
     pg.evaluate("$('#view-attic').scrollTo(0, 1e6)"); pg.wait_for_timeout(200)
+    # on its own: walks under something it can reach and jumps up onto it
+    pg.set_viewport_size({'width': 390, 'height': 844}); pg.evaluate("$('#view-attic').scrollTo(0, 1e6); clearTimeout(petTimer)"); pg.wait_for_timeout(300)
+    assert pg.evaluate('jumpUp()'), 'something to jump on'
+    pg.wait_for_function("where.y < 0 && !pet.classList.contains('walk') && !pet.classList.contains('leap')", timeout=15000); pg.wait_for_timeout(300)
+    got = pg.evaluate("(b => [...$$('.pinned, .card, .kpi'), ...[0,1,2].map(k => ({getBoundingClientRect: () => ({top: $('.shelf').getBoundingClientRect().top + 150 + k * 172})}))].some(el => Math.abs(el.getBoundingClientRect().top - b) < 3))(pet.getBoundingClientRect().bottom)")
+    assert got, 'standing on a surface'
+    pg.evaluate("clearTimeout(petTimer); hopDown(() => {})"); pg.wait_for_timeout(500)
     # held at the right side of the screen: carried to the Stats wall, and the room turns
     r = pg.evaluate("(r => [r.x + 38, r.y + 40])(pet.getBoundingClientRect())")
     m.move(r[0], r[1]); m.down(); m.move(380, r[1] - 60, steps=6); pg.wait_for_timeout(900); m.up(); pg.wait_for_timeout(600)
