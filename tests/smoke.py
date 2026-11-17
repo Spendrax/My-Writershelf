@@ -76,6 +76,11 @@ with sync_playwright() as p:
     # the buddy walks off the attic and comes in on the Stats wall's floor; the three floors are the same floor
     pg.evaluate('petGo(1)'); pg.wait_for_function("pet.parentElement === $('#view-stats .floor') && !pet.classList.contains('walk')", timeout=20000)
     assert pg.evaluate("$$('.floor').length") == 3
+    # the Install button shows when the browser says the app can be installed, and opens its install window
+    assert pg.is_hidden('#btnInstall')
+    pg.evaluate("window.asked=0; dispatchEvent(Object.assign(new Event('beforeinstallprompt'), {prompt(){asked++}, userChoice: Promise.resolve({outcome:'accepted'})}))")
+    pg.click('#btnInstall'); pg.wait_for_timeout(100)
+    assert pg.evaluate('asked') == 1 and pg.is_hidden('#btnInstall')
     pg.click('#btnSettings'); assert pg.inner_text('#gStatus') == 'Not set up yet.'
     assert not pg.errs, pg.errs
 

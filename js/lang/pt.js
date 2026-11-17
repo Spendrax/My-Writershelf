@@ -140,6 +140,8 @@ LANG.pt = {
     "Customize the attic: string lights, walls, floor, rug and the view from the window": "Personaliza o sótão: luzes, paredes, chão, tapete e a vista da janela",
     "Choose your buddy: cat, dog, fox, bunny, bear or mouse, and its fur": "Escolhe o teu companheiro: gato, cão, raposa, coelho, urso ou rato, e o seu pelo",
     "Your buddy walks around and visits the other walls": "O teu companheiro passeia e visita as outras paredes",
+    "Install": "Instalar",
+    "To install: tap Share, then “Add to Home Screen”": "Para instalar: toca em Partilhar e depois “Adicionar ao ecrã principal”",
   },
   tpl: {
     "Take “{1}” off your shelf? Your Google Doc is not touched.": "Tirar “{1}” da tua estante? O teu Google Doc não é alterado.",

@@ -154,3 +154,15 @@ textarea {
   display: flex;
   gap: 8px;
 }
+
+/* the "Install" button in the top bar (13-install-update.js) */
+.install {
+  padding: 8px 10px;
+  font-size: 13px;
+  white-space: nowrap;
+}
+.top .neon {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

@@ -140,6 +140,8 @@ LANG.ht = {
     "Customize the attic: string lights, walls, floor, rug and the view from the window": "Pèsonalize grenye a: limyè, mi, planche, tapi ak sa ou wè nan fenèt la",
     "Choose your buddy: cat, dog, fox, bunny, bear or mouse, and its fur": "Chwazi konpayon ou: chat, chen, rena, lapen, lous oswa sourit, ak plim li",
     "Your buddy walks around and visits the other walls": "Konpayon ou a ap mache epi vizite lòt mi yo",
+    "Install": "Enstale",
+    "To install: tap Share, then “Add to Home Screen”": "Pou enstale: peze Pataje, epi “Ajoute sou ekran akèy”",
   },
   tpl: {
     "Take “{1}” off your shelf? Your Google Doc is not touched.": "Retire “{1}” sou etajè ou? Google Doc ou a p ap touche.",
