@@ -215,11 +215,9 @@
 }
 
 /* ---------- Floor and rug: the same floor on the three walls, so it carries on when you turn ---------- */
-/* it stays at the bottom of the screen on every wall (what's on the wall scrolls down behind it) */
+/* it's the ground under each wall: it scrolls with the wall, at the very bottom */
 .floor {
-  position: sticky;
-  bottom: 0;
-  z-index: 3;
+  position: relative;
   margin-top: auto;
   height: 150px;
   /* 6 planks per wall, so the plank lines meet at the corners */
