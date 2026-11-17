@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>My Writershelf</title>
+<meta name="description" content="The books you're writing, on an attic shelf: word counts from Google Docs, a daily goal, streaks and stats.">
+<meta name="theme-color" content="#17110d">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/attic.css">
+<link rel="stylesheet" href="css/walls.css">
+<link rel="stylesheet" href="css/sheets.css">
+</head>
+<body>
+<header class="top">
+  <h1 class="neon">WRITERSHELF</h1>
+  <div class="hbtns"><button id="btnSettings" class="icon" aria-label="Settings">⚙</button></div>
+</header>
+
+<main>
+  <!-- The attic: slanted roof, string lights, today's note pinned to the wall, the shelf of books, the buddy -->
+  <section id="view-attic" class="view on">
+    <div class="roof" aria-hidden="true"><i class="lights"></i><i class="porthole"></i></div>
+    <div id="todayNote" class="pinned"></div>
+    <div id="shelf" class="shelf"></div>
+    <div class="floor">
+      <i class="rug"></i>
+      <div id="pet" class="pet" role="button" tabindex="0" aria-label="Your buddy">
+        <span class="bubble" id="bubble"></span>
+        <span class="cat"><i class="tail"></i><i class="body"></i><i class="head"></i></span>
+      </div>
+    </div>
+  </section>
+
+  <section id="view-goals" class="view wall away">
+    <div class="roof" aria-hidden="true"><i class="lights"></i></div>
+    <div id="goalsBody" class="wall-body"></div>
+  </section>
+  <section id="view-stats" class="view wall away">
+    <div class="roof" aria-hidden="true"><i class="lights"></i></div>
+    <div id="statsBody" class="wall-body"></div>
+  </section>
+</main>
+
+<div class="dots"><button data-k="-1" aria-label="Goals"></button><button data-k="0" class="on" aria-label="Attic"></button><button data-k="1" aria-label="Stats"></button></div>
+<button id="updBtn" class="upd" hidden>⟳ Update now</button>
+<button id="btnAdd" class="fab" aria-label="Add a book">+</button>
+
+<!-- Add: pick Google Docs, or add by hand -->
+<dialog id="dlgAdd" class="sheet">
+  <div class="sheet-h"><h2>Add a book</h2><button class="x" data-close aria-label="Close">✕</button></div>
+  <p class="dim">Pick the Google Docs you write in. The app reads their word count by itself from then on.</p>
+  <button id="addDocs" class="btn primary wide">📄 Pick from Google Docs</button>
+  <button id="addManual" class="btn ghost wide">Add it by hand</button>
+</dialog>
+
+<!-- A book's card -->
+<dialog id="dlgBook" class="sheet"><div id="bBody"></div></dialog>
+
+<!-- Add / edit form -->
+<dialog id="dlgEdit" class="sheet">
+  <form id="fEdit">
+    <div class="sheet-h"><h2 id="editH">Book</h2><button type="button" class="x" data-close aria-label="Close">✕</button></div>
+    <label>Title<input name="title" required maxlength="120"></label>
+    <label>Status</label><div class="seg" id="eStatus"></div>
+    <div class="two">
+      <label>Words so far<input name="words" type="number" min="0" inputmode="numeric"></label>
+      <label>Word goal for the book<input name="target" type="number" min="0" step="1000" inputmode="numeric"></label>
+    </div>
+    <p class="dim small" id="eDocHint" hidden>Words are counted from Google Docs.</p>
+    <label>Spine colour</label><div class="swatches" id="eColor"></div>
+    <label>Notes<textarea name="notes" rows="4" placeholder="Ideas, what happens next…"></textarea></label>
+    <div class="actions">
+      <button type="button" id="eDel" class="btn danger">Delete</button>
+      <button class="btn primary">Save</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Write here: what you type is added at the end of the Google Doc -->
+<dialog id="dlgWrite" class="sheet write">
+  <div class="sheet-h"><h2 id="wTitle"></h2><button class="x" data-close aria-label="Close">✕</button></div>
+  <div id="wCtx" class="ctx"></div>
+  <textarea id="wText" rows="9" placeholder="Keep writing…"></textarea>
+  <p class="dim small" id="wCount"></p>
+  <button id="wSend" class="btn primary wide">Add to my Google Doc</button>
+  <p class="dim small">Your text is added at the end of the Doc. To change what’s already written, open Google Docs. Until it’s sent, your text is kept on this phone.</p>
+</dialog>
+
+<!-- What's new -->
+<dialog id="dlgNews" class="sheet">
+  <div class="sheet-h"><h2>What’s new</h2><button class="x" data-close aria-label="Close">✕</button></div>
+  <div id="newsBody" class="news"></div>
+  <button class="btn primary wide" data-close>Got it</button>
+</dialog>
+
+<!-- Settings -->
+<dialog id="dlgSet" class="sheet">
+  <div class="sheet-h"><h2>Settings</h2><button class="x" data-close aria-label="Close">✕</button></div>
+  <div class="two">
+    <label>Daily word goal<input id="sGoal" type="number" min="1" step="50" inputmode="numeric"></label>
+    <label>Your buddy’s name<input id="sPet" maxlength="24"></label>
+  </div>
+  <h3>Google</h3>
+  <p class="dim small" id="gStatus"></p>
+  <button class="btn primary wide" id="gConnect">Connect Google</button>
+  <div class="row" id="gActions" hidden>
+    <button class="btn" id="gNow">Back up now</button>
+    <button class="btn ghost" id="gOff">Disconnect</button>
+  </div>
+  <h3>Display</h3>
+  <label>Language<select id="sLang"><option value="auto">Automatic</option><option value="en">English</option><option value="fr">Français</option><option value="es">Español</option><option value="ht">Kreyòl ayisyen</option><option value="pt">Português</option><option value="de">Deutsch</option><option value="it">Italiano</option></select></label>
+  <h3>Backup</h3>
+  <p class="dim">Your shelf lives on this phone. Save a backup now and then.</p>
+  <div class="row">
+    <button class="btn" id="sExport">Save backup</button>
+    <label class="btn">Load backup<input type="file" id="sImport" accept=".json,application/json" hidden></label>
+  </div>
+  <button class="btn ghost wide" id="sNews">What’s new</button>
+  <button class="btn ghost wide" id="sInstall" hidden>Install the app</button>
+  <p class="dim small">My Writershelf v<span id="ver"></span> · <a href="privacy.html">Privacy</a></p>
+</dialog>
+
+<div id="toast" role="status"></div>
+
+<script src="js/01-core.js"></script>
+<script src="js/02-google.js"></script>
+<script src="js/03-docs.js"></script>
+<script src="js/04-book-form.js"></script>
+<script src="js/05-book-card.js"></script>
+<script src="js/06-attic.js"></script>
+<script src="js/07-turning-walls.js"></script>
+<script src="js/08-buddy.js"></script>
+<script src="js/09-goals-stats.js"></script>
+<script src="js/10-write.js"></script>
+<script src="js/11-settings-backup.js"></script>
+<script src="js/12-drive-backup.js"></script>
+<script src="js/13-install-update.js"></script>
+<script src="js/14-whats-new.js"></script>
+<script src="js/15-languages.js"></script>
+</body>
+</html>

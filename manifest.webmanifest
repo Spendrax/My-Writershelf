@@ -1,0 +1,17 @@
+{
+  "name": "My Writershelf",
+  "short_name": "Writershelf",
+  "description": "The books you're writing, on an attic shelf: word counts from Google Docs, a daily goal, streaks and stats.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#17110d",
+  "theme_color": "#17110d",
+  "categories": ["productivity", "books"],
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
