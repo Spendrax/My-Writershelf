@@ -78,12 +78,14 @@ function translate(root) {
 
 function startLang(code) {
   ({ words: W } = LANG[code]);
-  TPL = Object.entries(LANG[code].tpl)
-    .map(([en, t]) => [en.replace(/[.!?]$/, ''), t.replace(/ ?[.!?]$/, '')]) // matched without end punctuation
-    .map(([en, t]) => [
-      new RegExp('^' + en.replace(/[.*+?^$()|[\]\\]/g, '\\$&').replace(/\{\d\}/g, '(.+?)') + '$'),
-      t,
-    ]);
+  // each phrase with a changing part becomes [pattern to recognise it, its translation]; end punctuation is left out
+  TPL = Object.entries(LANG[code].tpl).reduce((list, [en, t]) => {
+    const pattern = en
+      .replace(/[.!?]$/, '')
+      .replace(/[.*+?^$()|[\]\\]/g, '\\$&')
+      .replace(/\{\d\}/g, '(.+?)');
+    return list.concat([[new RegExp('^' + pattern + '$'), t.replace(/ ?[.!?]$/, '')]]);
+  }, []);
   document.documentElement.lang = code;
   translate(document.body);
   new MutationObserver((list) => {
