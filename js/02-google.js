@@ -10,7 +10,7 @@
 // From this app's own Google Cloud project (see README → "Setting up Google"). Empty = not set up yet.
 const GOOGLE_CLIENT_ID = ''; // "OAuth client ID" (web application)
 const GOOGLE_API_KEY = 'AIzaSyBLCdzlbLmuFPZXI2g29nUajHabFvUUbmY'; // "API key", needed by Google's file picker
-const HELPER = 'https://writershelf-helper.spendraxapp.workers.dev';
+const HELPER = 'https://my-writershelf.spendraxapp.workers.dev';
 const GOOGLE_SCOPES =
   'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.appdata';
 

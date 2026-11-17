@@ -1,7 +1,7 @@
 # Lets Cloudflare deploy the helper (tools/cloudflare-helper.js) by itself every time this repo changes.
 # Set up once in Cloudflare: Workers & Pages → Create → Import a repository → this repo.
 # The secrets (GOOGLE_ID, GOOGLE_SECRET) stay in Cloudflare.
-name = "writershelf-helper"
+name = "my-writershelf"
 main = "tools/cloudflare-helper.js"
 compatibility_date = "2026-01-01"
 keep_vars = true   # keep anything set by hand in the dashboard

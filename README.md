@@ -65,9 +65,9 @@ Until this is done the app works by hand (no Docs, no Drive backup).
    `https://spendrax.github.io/*` and to the Google Picker API.
 
 **Cloudflare** — https://dash.cloudflare.com
-6. Workers & Pages → Create → Import a repository → this repo (the name `writershelf-helper` comes from `wrangler.toml`).
+6. Workers & Pages → Create → Import a repository → this repo (its name must be the one in `wrangler.toml`: `my-writershelf`).
 7. The Worker → Settings → Variables and Secrets → add two secrets: `GOOGLE_ID` (the Client ID) and
-   `GOOGLE_SECRET` (the Client secret). Check https://writershelf-helper.spendraxapp.workers.dev/ping answers.
+   `GOOGLE_SECRET` (the Client secret). Check https://my-writershelf.spendraxapp.workers.dev/ping answers.
 
 **The app**
 8. In `js/02-google.js`, fill in `GOOGLE_CLIENT_ID` and `GOOGLE_API_KEY` (both are fine to be public; the
