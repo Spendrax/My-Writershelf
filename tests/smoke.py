@@ -195,6 +195,7 @@ with sync_playwright() as p:
     assert pg.evaluate('document.documentElement.dataset.sky') == 'snow'
     pg.click('.porthole'); assert pg.inner_text('#toast') == '-2° · Snow'
     # Open and write: the whole Doc, change a paragraph, add at the end, save
+    assert pg.evaluate("writing = {b: byId('b1'), paras: [{text: 'a'}, {text: ''}, {text: 'b'}, {text: ''}, {text: '  '}]}; drawDoc(); [...$$('#wDoc p')].map(p => p.className)") == ['', 'blank', ''], 'no empty lines after the last one'
     pg.click('.spine'); pg.click('[data-do=write]'); pg.wait_for_timeout(500)
     assert pg.evaluate("[...$$('#wDoc p')].map(p => p.className + ':' + p.innerText.slice(0, 11))") == ['h:Chapter One', ':word word w']
     pg.click('#wDoc p[data-i="1"]')

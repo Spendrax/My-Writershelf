@@ -37,6 +37,7 @@ async function readDoc(b) {
       end: el.endIndex,
       text,
       h: /HEADING|TITLE/.test(el.paragraph.paragraphStyle?.namedStyleType || ''),
+      brk: parts.some((p) => p.pageBreak), // a page break (often between chapters)
       fixed: parts.some((p) => !p.textRun),
     });
   }, []);
@@ -53,14 +54,16 @@ const docText = (w, edits) => w.paras.reduce((t, p, i) => t + (edits[i] ?? p.tex
 
 /* ---------- The sheet ---------- */
 
+// Empty lines after your last line aren't shown, so the Doc ends where your writing ends
 function drawDoc() {
   const edits = loadDraft(writing.b).edits;
-  $('#wDoc').innerHTML = writing.paras.reduce(
-    (h, p, i) =>
-      h +
-      `<p data-i="${i}" class="${p.h ? 'h' : ''}${p.fixed ? ' fixed' : ''}${edits[i] != null ? ' edited' : ''}">${esc(edits[i] ?? p.text) || '<br>'}</p>`,
-    '',
-  );
+  const shown = (p, i) => (edits[i] ?? p.text).trim() || p.fixed;
+  const last = writing.paras.reduce((n, p, i) => (shown(p, i) ? i : n), -1);
+  $('#wDoc').innerHTML = writing.paras.slice(0, last + 1).reduce((h, p, i) => {
+    const text = edits[i] ?? p.text;
+    const kind = [p.h && 'h', p.brk && 'brk', p.fixed && 'fixed', !text.trim() && 'blank', edits[i] != null && 'edited'];
+    return h + `<p data-i="${i}" class="${kind.filter(Boolean).join(' ')}">${p.brk ? '' : esc(text) || '<br>'}</p>`;
+  }, '');
 }
 
 function drawCount() {

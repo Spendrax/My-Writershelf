@@ -280,6 +280,17 @@ dialog.write[open] {
 #wDoc p.fixed {
   color: var(--dim);
 }
+/* an empty line takes less room than a written one */
+#wDoc p.blank {
+  margin: 0;
+  height: 0.7em;
+}
+/* a page break: a dashed line */
+#wDoc p.brk {
+  height: 0;
+  margin: 1em 0;
+  border-top: 1px dashed var(--line);
+}
 #wDoc p[contenteditable] {
   outline: 1px dashed var(--line);
   background: #ffffff08;

@@ -64,7 +64,7 @@ const ANIMALS = {
 const HATS = {
   beret: {
     name: 'Beret',
-    svg: '<ellipse cx="45" cy="9" rx="12" ry="4.5" fill="#c0392b"/><circle cx="46" cy="4.6" r="1.4" fill="#c0392b"/>',
+    svg: '<ellipse cx="46" cy="9" rx="12" ry="4.5" fill="#c0392b"/><circle cx="46" cy="4.6" r="1.4" fill="#c0392b"/>',
   },
   beanie: {
     name: 'Beanie',

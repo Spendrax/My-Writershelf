@@ -242,6 +242,19 @@ addEventListener('pointercancel', dropPet);
 /* ---------- Food bowls ---------- */
 // One on each floor. Tap it: it fills up, the buddy comes over (from any wall, even asleep) and eats.
 
+// The bowl: kibble (shown once it's filled), the bowl with its rim, and a paw print on the front
+const BOWL_SVG = `<svg viewBox="0 0 44 26" aria-hidden="true">
+  <g class="food">${[8, 14, 20, 26, 32, 11, 17, 23, 29, 35, 14, 22, 30].reduce(
+    (h, x, i) => h + `<circle cx="${x}" cy="${i < 5 ? 9 : i < 10 ? 7 : 5}" r="3" fill="${i % 2 ? '#a8662e' : '#c98a4a'}"/>`,
+    '',
+  )}</g>
+  <path d="M2 10h40l-4 13q-1 3-4 3H10q-3 0-4-3z" fill="#d9534f"/>
+  <ellipse cx="22" cy="10" rx="20" ry="3.5" fill="#f08a84"/>
+  <ellipse cx="22" cy="10" rx="17" ry="2.3" fill="#7a2b28"/>
+  <g fill="#fff" opacity=".85"><ellipse cx="22" cy="19.5" rx="2.6" ry="2.2"/><circle cx="18.6" cy="16.3" r="1.1"/><circle cx="21" cy="15" r="1.1"/><circle cx="23.4" cy="15" r="1.1"/><circle cx="25.8" cy="16.3" r="1.1"/></g>
+</svg>`;
+
+$$('.bowl').forEach((bowl) => (bowl.innerHTML = BOWL_SVG));
 $$('.bowl').forEach((bowl) =>
   bowl.addEventListener('click', () => {
     if (bowl.classList.contains('full') || hold) return;
