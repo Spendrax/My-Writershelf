@@ -5,6 +5,15 @@
 
 const NEWS = [
   {
+    v: '1.5',
+    items: [
+      '\u{1F4D6} Open and write: read your whole Google Doc in the app, tap a paragraph to change it, and keep writing at the end',
+      '\u2600\uFE0F The window shows the real weather outside. Tap it for the temperature',
+      '\u{1F495} Play with your buddy: tap it, tap it twice, hold your finger on it to pet it, or tap the floor to call it',
+      '\u{1F3A9} Hats for your buddy, won with medals',
+    ],
+  },
+  {
     v: '1.4',
     items: ['\u{1F408} Your buddy jumps up onto the shelves, today\u2019s note and the cards on its own'],
   },

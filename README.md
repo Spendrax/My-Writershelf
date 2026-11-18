@@ -30,17 +30,20 @@ Live at https://spendrax.github.io/My-Writershelf/
 | `js/05-book-card.js` | The card shown when you tap a book |
 | `js/06-attic.js` | Today's note and the shelf |
 | `js/07-turning-walls.js` | Swiping round the hexagon: Goals ← Attic → Stats |
-| `js/08-buddy.js` | The buddy: drawing each animal (the `ANIMALS` list), its moods, what it says |
-| `js/09-goals-stats.js` | The Goals wall and the Stats wall (medals are the `MEDALS` list) |
-| `js/10-write.js` | Write here: your text is added at the end of the Google Doc |
+| `js/08-buddy.js` | The buddy: drawing each animal (the `ANIMALS` list) and its hats (`HATS`), its moods, what it says |
+| `js/09-goals-stats.js` | The Goals wall and the Stats wall (medals are the `MEDALS` list; each one wins a hat) |
+| `js/10-write.js` | Open and write: the whole Google Doc, change any paragraph, keep writing at the end, save |
 | `js/11-settings-backup.js` | Settings, saving and loading a backup file |
 | `js/12-drive-backup.js` | Automatic Google Drive backup and syncing between devices |
 | `js/13-install-update.js` | Offline copy, "Update now" button, Install button |
 | `js/14-whats-new.js` | The "What's new" card: add an entry to `NEWS` for each important update |
 | `js/16-buddy-moves.js` | The buddy's walks along the floor and over to the other walls; jumping up onto things, picking it up, landing, the food bowls |
 | `js/17-customize.js` | The 🎨 sheet: string lights, walls, floor, rug, window, animal, fur (the `LOOKS` list); turning the room to what you're changing |
+| `js/18-weather.js` | The real weather in the attic's window (place from the helper, weather from Open-Meteo) |
+| `js/19-achievements.js` | Noticing new medals and unlocking their hats |
+| `js/20-buddy-play.js` | Playing with the buddy: tap, double tap, petting, tap the floor to call it |
 | `js/15-languages.js`, `js/lang/` | The app in French, Spanish, Haitian Creole, Portuguese, German, Italian |
-| `tools/cloudflare-helper.js` | This app's own Cloudflare Worker: only the Google sign-in goes through it |
+| `tools/cloudflare-helper.js` | This app's own Cloudflare Worker: the Google sign-in, and your rough position for the weather |
 | `sw.js` | The offline copy. Bump `V` on every release, and list any new file in `SHELL` |
 
 ## Releasing an update

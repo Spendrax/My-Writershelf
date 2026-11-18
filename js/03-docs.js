@@ -5,7 +5,6 @@
 //     and when you tap ⟳ on today's note. New words go on today's log (setWords in 01-core.js).
 
 const docLink = (b) => `https://docs.google.com/document/d/${b.doc}/edit`;
-const tails = {}; // the last lines of each Doc (book id → text), shown above the box in "Write here"
 
 /* ---------- Picking Docs ---------- */
 
@@ -59,12 +58,11 @@ async function addDocs(docs) {
 
 /* ---------- Word counts ---------- */
 
-// Reads one Doc again if it changed since last time. force: read it anyway (Write here needs its last lines).
+// Reads one Doc again if it changed since last time. force: read it anyway.
 async function refreshBook(b, counts = true, force = false) {
   const meta = await (await gfetch(`drive/v3/files/${b.doc}?fields=modifiedTime`)).json();
   if (!force && meta.modifiedTime === b.docTime) return;
   const text = await (await gfetch(`drive/v3/files/${b.doc}/export?mimeType=text/plain`)).text();
-  tails[b.id] = text.trim().slice(-1200);
   b.docTime = meta.modifiedTime;
   setWords(b, countWords(text), counts);
 }

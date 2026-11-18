@@ -1,7 +1,7 @@
 'use strict';
 // THE GOALS WALL (left of the attic) and THE STATS WALL (right of it).
 //   Goals: today's words against the daily goal, the streak with the last 7 days, each book's word goal
-//   Stats: totals, the last 14 days as bars, and medals
+//   Stats: totals, the last 14 days as bars, and medals (each one wins a hat)
 
 // The last n days, oldest first: [{ day: '2026-11-16', words, hit }]
 function lastDays(n) {
@@ -48,25 +48,38 @@ $('#goalsBody').onclick = (e) => {
 
 /* ---------- Stats ---------- */
 
-// Medals: each one is earned once its test is true
+// Medals: each one is earned once its test is true, and wins your buddy a hat (HATS in 08-buddy.js).
+// 19-achievements.js notices new ones and remembers them (set.got), so a medal stays won.
 const MEDALS = [
-  { icon: '✏️', name: 'First 1,000 words', test: (s) => s.total >= 1000 },
-  { icon: '📜', name: '10,000 words', test: (s) => s.total >= 10000 },
-  { icon: '📚', name: '50,000 words', test: (s) => s.total >= 50000 },
-  { icon: '🔥', name: '7-day streak', test: (s) => s.best >= 7 },
-  { icon: '🌙', name: '30-day streak', test: (s) => s.best >= 30 },
-  { icon: '🏆', name: 'A finished book', test: (s) => s.done >= 1 },
+  { id: 'w1k', icon: '✏️', name: 'First 1,000 words', hat: 'beret', test: (s) => s.total >= 1000 },
+  { id: 'w10k', icon: '📜', name: '10,000 words', hat: 'beanie', test: (s) => s.total >= 10000 },
+  { id: 'w50k', icon: '📚', name: '50,000 words', hat: 'tophat', test: (s) => s.total >= 50000 },
+  { id: 's7', icon: '🔥', name: '7-day streak', hat: 'party', test: (s) => s.best >= 7 },
+  { id: 's30', icon: '🌙', name: '30-day streak', hat: 'wizard', test: (s) => s.best >= 30 },
+  { id: 'done', icon: '🏆', name: 'A finished book', hat: 'crown', test: (s) => s.done >= 1 },
+  { id: 'pets', icon: '🐾', name: 'Pet your buddy 25 times', hat: 'flowers', test: (s) => s.pets >= 25 },
+  { id: 'fed', icon: '🍖', name: 'Feed your buddy 10 times', hat: 'chef', test: (s) => s.fed >= 10 },
 ];
+const hasMedal = (m) => (set.got || []).includes(m.id);
 
-function drawStats() {
+// The numbers the Stats wall and the medals are worked out from
+function medalStats() {
   const days = lastDays(14);
-  const s = {
+  return {
+    days,
     total: books.reduce((t, b) => t + (b.words || 0), 0),
     done: books.reduce((t, b) => t + (b.status === 'done'), 0),
     week: days.slice(7).reduce((t, d) => t + d.words, 0),
     bestDay: Math.max(0, ...Object.values(set.log)),
     best: bestStreak(),
+    pets: set.pets || 0,
+    fed: set.fed || 0,
   };
+}
+
+function drawStats() {
+  const s = medalStats();
+  const days = s.days;
   const top = Math.max(1, ...days.map((d) => d.words));
   $('#statsBody').innerHTML = `
     <h2>STATS</h2>
@@ -77,7 +90,7 @@ function drawStats() {
       <div class="kpi"><b>${s.done}</b><span>Books finished</span></div>
     </div>
     <div class="card"><h3>Last 14 days</h3><div class="dist">${days.reduce((h, d) => h + `<div><i class="${d.hit ? 'hit' : ''}" style="height:${(d.words / top) * 60}px" title="${num(d.words)}"></i>${+d.day.slice(8)}</div>`, '')}</div></div>
-    <div class="card"><h3>Medals</h3><div class="medals">${MEDALS.reduce((h, m) => h + `<div class="medal${m.test(s) ? ' got' : ''}"><i>${m.icon}</i><span>${m.name}</span></div>`, '')}</div></div>`;
+    <div class="card"><h3>Medals</h3><div class="medals">${MEDALS.reduce((h, m) => h + `<div class="medal${hasMedal(m) || m.test(s) ? ' got' : ''}"><i>${m.icon}</i><span>${m.name}</span><small>🎩 ${HATS[m.hat].name}</small></div>`, '')}</div></div>`;
 }
 
 on('change', () => {

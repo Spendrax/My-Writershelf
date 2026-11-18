@@ -8,12 +8,13 @@
 //   • tap a food bowl on the floor: it comes over and eats
 //   where = { wall, x, y }: which wall it's on (-1 Goals, 0 Attic, 1 Stats), how far from the left of the floor,
 //   and how far above the floor (0 on the floor, negative when it's up on something)
+//   where.on = what it's standing on (see surfaces()), so it stays on it when the walls change size
 
 const PET_SPEED = 55; // pixels a second
 const PET_W = 76;
 const PET_H = 78;
 const PET_FLOOR = 50; // how far above the bottom of the floor it stands (css/buddy.css)
-const where = { wall: 0, x: 90, y: 0 };
+const where = { wall: 0, x: 90, y: 0, on: null };
 let petTimer = 0;
 
 const floorOf = (k) => $(`#view-${Object.keys(WALLS).find((v) => WALLS[v] === k)} .floor`);
@@ -27,7 +28,7 @@ const moveTo = (x, y, secs, ease = 'linear') => {
 
 // Puts it at x on the floor right away (no walking)
 function placePet(x) {
-  Object.assign(where, { x, y: 0 });
+  Object.assign(where, { x, y: 0, on: null });
   moveTo(x, 0, 0);
   pet.classList.toggle('right', x > floorWidth() / 2); // the bubble opens toward the middle
   void pet.offsetWidth; // so the next walk starts from here
@@ -51,7 +52,7 @@ function walkPet(x, then) {
 // Up on something: hops down to the floor first, then does `then`
 function hopDown(then) {
   if (!where.y) return then();
-  where.y = 0;
+  Object.assign(where, { y: 0, on: null });
   moveTo(where.x, 0, 0.35, 'ease-in');
   clearTimeout(petTimer);
   petTimer = setTimeout(then, 400);
@@ -92,22 +93,24 @@ function wanderPet() {
 
 // You turned to another wall: it thinks about following soon (unless it's already busy)
 on('view', () => busy() || restPet(1500 + Math.random() * 2500));
-addEventListener('resize', () => busy() || landPet());
 
 /* ---------- Landing on things ---------- */
-// The tops of things it can stand on, on the wall it's on, measured on the screen: { top, left, right }
+// The tops of things it can stand on, on the wall it's on, measured on the screen: { top, left, right, on }
+// `on` names it: 'thing0', 'thing1'… (today's note, the cards, in page order; cards are redrawn often, so
+// they're named by their place, not kept as elements), or 'board0', 'board1'… for the shelf's boards
 
 function surfaces() {
   const wall = floorOf(where.wall).closest('.view');
-  const tops = $$('.pinned, .card, .kpi', wall).reduce((list, el) => {
+  const tops = $$('.pinned, .card, .kpi', wall).reduce((list, el, i) => {
     const r = el.getBoundingClientRect();
-    return list.concat({ top: r.top, left: r.left, right: r.right });
+    return list.concat({ top: r.top, left: r.left, right: r.right, on: 'thing' + i });
   }, []);
   // the shelf's boards: one under each row of books (every 172px, see .shelf in css/attic.css)
   const shelf = $('.shelf', wall);
   if (!shelf) return tops;
   const s = shelf.getBoundingClientRect();
-  for (let top = s.top + 150; top < s.bottom - 10; top += 172) tops.push({ top, left: s.left + 12, right: s.right - 12 });
+  for (let top = s.top + 150, n = 0; top < s.bottom - 10; top += 172, n++)
+    tops.push({ top, left: s.left + 12, right: s.right - 12, on: 'board' + n });
   return tops;
 }
 
@@ -127,7 +130,7 @@ function jumpUp() {
   const y = s.top - ground;
   walkPet(x, () => {
     // up a little past it, then down onto it
-    where.y = y;
+    Object.assign(where, { y, on: s.on });
     pet.classList.add('leap');
     moveTo(x, y - 24, 0.4, 'ease-out');
     petTimer = setTimeout(() => {
@@ -147,17 +150,30 @@ function landPet() {
   const feet = ground + where.y;
   const mid = f.left + where.x + PET_W / 2;
   const below = surfaces().reduce(
-    (best, s) => (s.left <= mid && mid <= s.right && s.top >= feet - 12 && s.top < best ? s.top : best),
-    ground,
+    (best, s) => (s.left <= mid && mid <= s.right && s.top >= feet - 12 && s.top < best.top ? s : best),
+    { top: ground, on: null },
   );
-  const y = below < ground - 5 ? below - ground : 0;
+  const y = below.top < ground - 5 ? below.top - ground : 0;
+  where.on = y ? below.on : null;
   const secs = Math.min(0.6, 0.15 + Math.abs(y - where.y) / 900); // a longer fall takes a little longer
   where.y = y;
   moveTo(where.x, y, secs, 'ease-in');
   pet.classList.toggle('right', where.x > floorWidth() / 2);
 }
-// the shelf changed (a book added or removed): it finds its footing again
-on('change', () => setTimeout(() => where.y && !busy() && landPet(), 50));
+// The walls changed size (Customize opened, a book added, the phone turned…): it stays on what it was standing on
+function keepFooting() {
+  if (busy() || hold) return;
+  if (!where.on) return placePet(Math.min(where.x, floorWidth() - PET_W));
+  const s = surfaces().find((t) => t.on === where.on);
+  if (!s) return landPet(); // it's gone (a row of books removed): falls to what's below
+  const f = floorOf(where.wall).getBoundingClientRect();
+  where.y = s.top - (f.bottom - PET_FLOOR);
+  where.x = Math.max(s.left - f.left, Math.min(where.x, s.right - f.left - PET_W));
+  moveTo(where.x, where.y, 0);
+}
+const footing = new ResizeObserver(() => keepFooting());
+$$('.view, .shelf').forEach((el) => footing.observe(el));
+on('change', () => setTimeout(keepFooting, 50)); // the cards were redrawn
 
 /* ---------- Picking it up ---------- */
 // Press and move: it follows your finger. Let go: it falls onto whatever is below.
@@ -242,6 +258,9 @@ $$('.bowl').forEach((bowl) =>
           pet.classList.remove('eat');
           bowl.classList.remove('full');
           say('😋 Yum! Thanks!');
+          set.fed = (set.fed || 0) + 1; // for the "Feed your buddy 10 times" medal
+          saveSet();
+          emit('fed');
           restPet();
         }, 3000);
       }),

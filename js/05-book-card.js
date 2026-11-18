@@ -14,7 +14,7 @@ function openBook(id) {
     ${b.notes ? `<p class="notes">${esc(b.notes)}</p>` : ''}
     ${
       b.doc
-        ? `<button class="btn primary wide" data-do="write">✍️ Write here</button>
+        ? `<button class="btn primary wide" data-do="write">📖 Open and write</button>
            <a class="btn wide" href="${docLink(b)}" target="_blank" rel="noopener">📄 Open in Google Docs</a>
            <button class="btn ghost wide" data-do="refresh">⟳ Read the word count again</button>`
         : ''

@@ -1,5 +1,5 @@
 // Offline copy. Bump V on every release.
-const V = 'ws-v12';
+const V = 'ws-v13';
 const SHELL = [
   './', 'index.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png',
   'css/base.css',
@@ -24,6 +24,9 @@ const SHELL = [
   'js/15-languages.js',
   'js/16-buddy-moves.js',
   'js/17-customize.js',
+  'js/18-weather.js',
+  'js/19-achievements.js',
+  'js/20-buddy-play.js',
   'js/lang/fr.js',
   'js/lang/es.js',
   'js/lang/ht.js',

@@ -3,8 +3,10 @@
 //   • draws it: every animal shares one body (4 legs, belly, head, eyes, nose, mouth); ANIMALS adds what
 //     makes each one itself (ears, tail, muzzle, whiskers…). The colours come from css/buddy.css (--fur).
 //   • gives it moods: happy once the daily goal is done, asleep at night, sad when a streak may be lost
-//   • makes it talk: tap it to hear how today is going
-// Walking around is in 16-buddy-moves.js; choosing the animal and its fur is in 17-customize.js.
+//   • its hats (HATS), won with medals (19-achievements.js)
+//   • makes it talk about how today is going
+// Walking around is in 16-buddy-moves.js; petting and playing in 20-buddy-play.js;
+// choosing the animal, its fur and its hat in 17-customize.js.
 
 const pet = $('#pet');
 const PINK = '#f4a9b8';
@@ -17,21 +19,25 @@ const ANIMALS = {
     back: `<path class="f" d="M35 13l1-11 9 6zM57 13l-1-11-9 6z"/><path fill="${PINK}" d="M37.5 10.5l.6-5.5 4.6 3.2zM54.5 10.5l-.6-5.5-4.6 3.2z"/>`,
     front: '<path d="M37 25l-5-1M37 26.5l-5 1M56 25l5-1M56 26.5l5 1" stroke="#fff9" stroke-width=".6"/>',
     nose: PINK,
+    pet: '💕 Purrr…',
   },
   dog: {
     name: 'Dog',
+    pet: '💕 Happy tail wag',
     tail: '<path class="ts" d="M12 31C6 28 6 21 9 17"/>',
     front:
       '<ellipse class="f2" cx="34.5" cy="19" rx="4" ry="8.5" transform="rotate(14 34.5 19)"/><ellipse class="f2" cx="57.5" cy="19" rx="4" ry="8.5" transform="rotate(-14 57.5 19)"/><ellipse class="fl" cx="46.5" cy="26.2" rx="6.5" ry="4.6"/>',
   },
   fox: {
     name: 'Fox',
+    pet: '💕 Happy yip',
     tail: '<path class="f" d="M13 35C0 37-2 23 6 14c3 7 6 12 9 15z"/><path fill="#fff" d="M6 14c-3 3-4.5 6.5-4.5 9.5 3.5-1 6.5-3 7.5-5.500z"/>',
     back: '<path class="f" d="M34 14V1l10 7zM58 14V1L48 8z"/><path fill="#3a2418" d="M34 1v5l3.5-2.300zM58 1v5l-3.5-2.300z"/>',
     front: '<ellipse fill="#fff" cx="46" cy="27.5" rx="8.5" ry="5.2"/>',
   },
   bunny: {
     name: 'Bunny',
+    pet: '💕 Nose wiggle',
     tail: '<circle fill="#fff" cx="11" cy="32" r="4.5"/>',
     back: `<ellipse class="f" cx="41" cy="2" rx="3.6" ry="10" transform="rotate(-8 41 8)"/><ellipse fill="${PINK}" cx="41" cy="2.5" rx="1.6" ry="7" transform="rotate(-8 41 8)"/><ellipse class="f" cx="51" cy="2" rx="3.6" ry="10" transform="rotate(8 51 8)"/><ellipse fill="${PINK}" cx="51" cy="2.5" rx="1.6" ry="7" transform="rotate(8 51 8)"/>`,
     front: '<rect x="45.3" y="27.8" width="2.4" height="2.2" rx=".5" fill="#fff"/>',
@@ -39,12 +45,14 @@ const ANIMALS = {
   },
   bear: {
     name: 'Bear',
+    pet: '💕 Happy grumble',
     tail: '<circle class="f2" cx="11.5" cy="31" r="3"/>',
     back: '<circle class="f" cx="36" cy="10.5" r="4.8"/><circle class="fl" cx="36" cy="10.5" r="2.3"/><circle class="f" cx="56" cy="10.5" r="4.8"/><circle class="fl" cx="56" cy="10.5" r="2.3"/>',
     front: '<ellipse class="fl" cx="46.5" cy="26.2" rx="6" ry="4.5"/>',
   },
   mouse: {
     name: 'Mouse',
+    pet: '💕 Squeak',
     tail: `<path d="M12 36C2 38 0 28 5 24" stroke="${PINK}" stroke-width="1.8" fill="none" stroke-linecap="round"/>`,
     back: `<circle class="f" cx="35.5" cy="10" r="7"/><circle fill="${PINK}" cx="35.5" cy="10" r="4.5"/><circle class="f" cx="56.5" cy="10" r="7"/><circle fill="${PINK}" cx="56.5" cy="10" r="4.5"/>`,
     front: '<path d="M37 25.500l-4-.5M56 25.500l4-.5" stroke="#fff9" stroke-width=".6"/>',
@@ -52,12 +60,52 @@ const ANIMALS = {
   },
 };
 
+// Hats, drawn on top of the head (the head is a circle at 46,21 with a radius of 13 in every animal)
+const HATS = {
+  beret: {
+    name: 'Beret',
+    svg: '<ellipse cx="45" cy="9" rx="12" ry="4.5" fill="#c0392b"/><circle cx="46" cy="4.6" r="1.4" fill="#c0392b"/>',
+  },
+  beanie: {
+    name: 'Beanie',
+    svg: '<path d="M34 12Q46-5 58 12z" fill="#3d7ea6"/><rect x="33" y="9.5" width="26" height="4" rx="2" fill="#2c5f7d"/><circle cx="46" cy="0.5" r="2.8" fill="#fff"/>',
+  },
+  tophat: {
+    name: 'Top hat',
+    svg: '<rect x="38" y="-7" width="16" height="15" rx="1.5" fill="#222"/><rect x="38" y="3.5" width="16" height="3" fill="#b33"/><ellipse cx="46" cy="8" rx="13" ry="2.8" fill="#222"/>',
+  },
+  party: {
+    name: 'Party hat',
+    svg: '<g transform="rotate(12 46 10)"><path d="M39 10h14L46-8z" fill="#f2c94c"/><path d="M41 5l9 2M43 0l5 1" stroke="#e74c8c" stroke-width="1.6"/><circle cx="46" cy="-8" r="2.2" fill="#e74c8c"/></g>',
+  },
+  wizard: {
+    name: 'Wizard hat',
+    svg: '<path d="M37 10h18l-6-19q-3-4-1 4z" fill="#4b3a8c"/><ellipse cx="46" cy="10" rx="14" ry="3" fill="#4b3a8c"/><path d="M46 0l.8 1.8 1.9.2-1.4 1.3.4 1.9-1.7-1-1.7 1 .4-1.9-1.4-1.3 1.9-.2z" fill="#ffd76b"/>',
+  },
+  crown: {
+    name: 'Crown',
+    svg: '<path d="M36 11V2l5 4 5-7 5 7 5-4v9z" fill="#f2c94c" stroke="#b8862b" stroke-width=".8"/><circle cx="46" cy="7" r="1.6" fill="#c0392b"/><circle cx="40" cy="8" r="1.1" fill="#2f80ed"/><circle cx="52" cy="8" r="1.1" fill="#2f80ed"/>',
+  },
+  flowers: {
+    name: 'Flower crown',
+    svg: [36, 41, 46, 51, 56].reduce(
+      (h, x, i) =>
+        h + `<circle cx="${x}" cy="${9 + (x - 46) ** 2 / 40}" r="2.6" fill="${['#ff8fb1', '#ffd76b', '#ff8fb1', '#b7a6ff', '#ffd76b'][i]}"/><circle cx="${x}" cy="${9 + (x - 46) ** 2 / 40}" r=".9" fill="#fff"/>`,
+      '<path d="M35 12Q46 6 57 12" stroke="#5f9e5a" stroke-width="1.5" fill="none"/>',
+    ),
+  },
+  chef: {
+    name: 'Chef’s hat',
+    svg: '<circle cx="41" cy="1.5" r="5" fill="#fff"/><circle cx="51" cy="1.5" r="5" fill="#fff"/><circle cx="46" cy="-1" r="6" fill="#fff"/><rect x="37" y="2" width="18" height="8.5" rx="2" fill="#fff" stroke="#ddd" stroke-width=".6"/>',
+  },
+};
+
 // One leg with its paw. a/b: the two groups that swing in turn when walking · far: the legs on the other side
 const leg = (x, group, far) =>
   `<g class="leg ${group}"><rect class="${far ? 'f2' : 'f'}" x="${x}" y="38" width="6.5" height="14" rx="3.2"/><ellipse class="fl" cx="${x + 3.6}" cy="51.5" rx="3.7" ry="2"/></g>`;
 
-// The whole animal, facing right
-function petSVG(kind) {
+// The whole animal, facing right, with its hat (or none)
+function petSVG(kind, hat) {
   const a = ANIMALS[kind] || ANIMALS.cat;
   return `<svg viewBox="0 -10 64 66" aria-hidden="true">
     <ellipse cx="30" cy="54" rx="21" ry="2.5" fill="#0005"/>
@@ -77,6 +125,7 @@ function petSVG(kind) {
       <path class="mouth line" d="M43.5 27.200q1.4 1.7 2.8 0q1.4 1.7 2.8 0"/>
       <path class="smile" d="M43.6 27q2.7 4.6 5.4 0z" fill="#c2455a" stroke="#2a1c10" stroke-width=".8" stroke-linejoin="round"/>
       <path class="frown line" d="M44 29q2.3-2 4.6 0"/>
+      <g class="hat">${HATS[hat]?.svg || ''}</g>
     </g>
   </svg>`;
 }
@@ -92,9 +141,11 @@ function buddyMood() {
 }
 
 function drawBuddy() {
-  if (pet.dataset.kind !== set.look.kind) {
+  const look = set.look.kind + ' ' + set.look.hat;
+  if (pet.dataset.look !== look) {
+    pet.dataset.look = look;
     pet.dataset.kind = set.look.kind;
-    $('#petArt').innerHTML = petSVG(set.look.kind);
+    $('#petArt').innerHTML = petSVG(set.look.kind, set.look.hat);
   }
   ['happy', 'asleep', 'sad'].forEach((m) => pet.classList.toggle(m, m === buddyMood()));
   pet.setAttribute('aria-label', set.pet);
@@ -121,7 +172,6 @@ function say(text, ms = 4500) {
   say.t = setTimeout(() => pet.classList.remove('talk'), ms);
 }
 
-pet.onclick = () => say(buddyLine());
 pet.onkeydown = (e) => e.key === 'Enter' && pet.click();
 
 on('change', drawBuddy);

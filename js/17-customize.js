@@ -10,13 +10,28 @@ const LOOKS = [
   { k: 'wall', name: 'Walls', see: 'top', colors: ['#17110d', '#1d1522', '#101a1c', '#1c1b12', '#231413'] },
   { k: 'floor', name: 'Floor', see: 'floor', colors: ['#4a3320', '#7a5c3a', '#3a2626', '#3d4046'] },
   { k: 'rug', name: 'Rug', see: 'floor', on: 'attic', colors: ['#9c3f33', '#2f5d50', '#34507d', '#7a5a2a', 'none'] },
-  { k: 'sky', name: 'Window', see: 'top', on: 'attic', names: { night: 'Night', dusk: 'Sunset', day: 'Day', rain: 'Rain' } },
+  {
+    k: 'sky',
+    name: 'Window',
+    see: 'top',
+    on: 'attic',
+    names: { live: 'Real weather', day: 'Day', night: 'Night', dusk: 'Sunset', clouds: 'Clouds', rain: 'Rain', snow: 'Snow' },
+  },
   {
     k: 'kind',
     name: 'Animal',
     see: 'floor',
     on: 'pet',
     names: Object.keys(ANIMALS).reduce((o, kind) => ({ ...o, [kind]: ANIMALS[kind].name }), {}),
+  },
+  {
+    k: 'hat',
+    name: 'Hat',
+    see: 'floor',
+    on: 'pet',
+    // won with medals (19-achievements.js); a hat not won yet says which medal wins it
+    names: Object.keys(HATS).reduce((o, hat) => ({ ...o, [hat]: HATS[hat].name }), { none: 'No hat' }),
+    locked: (hat) => hat !== 'none' && !hatUnlocked(hat) && MEDALS.find((m) => m.hat === hat).name,
   },
   { k: 'fur', name: 'Fur', see: 'floor', on: 'pet', colors: ['#e8964a', '#9a9ea8', '#f3ead8', '#7a5433', '#3a3a44', '#f2c94c', '#ffffff'] },
 ];
@@ -28,7 +43,7 @@ function applyLook() {
   Object.entries({ '--led': led, '--wall': wall, '--fl': floor, '--rug': rug, '--fur': fur }).forEach(([name, v]) =>
     root.style.setProperty(name, v),
   );
-  root.dataset.sky = sky;
+  if (sky !== 'live') root.dataset.sky = sky; // the real weather is put in by 18-weather.js
   $('.rug').hidden = rug === 'none';
   emit('look'); // the buddy redraws itself if the animal changed
 }
@@ -50,7 +65,11 @@ function drawLook() {
             b + `<button data-v="${c}"${on(c)} style="--c:${c}" aria-label="${o.name}">${c === 'none' ? '✕' : ''}</button>`,
           '',
         )
-      : Object.entries(o.names).reduce((b, [v, name]) => b + `<button data-v="${v}"${on(v)}>${name}</button>`, '');
+      : Object.entries(o.names).reduce(
+          (b, [v, name]) =>
+            b + (o.locked?.(v) ? `<button data-v="${v}" class="locked">🔒 ${name}</button>` : `<button data-v="${v}"${on(v)}>${name}</button>`),
+          '',
+        );
     return h + `<div class="opt">${o.name}<div class="${o.colors ? 'swatches' : 'seg'}" data-k="${o.k}">${buttons}</div></div>`;
   }, '');
 }
@@ -67,6 +86,7 @@ $('#cBody').onclick = (e) => {
   const b = e.target.closest('button[data-v]');
   if (!b) return;
   const o = LOOKS.find((l) => l.k === b.parentElement.dataset.k);
+  if (o.locked?.(b.dataset.v)) return toast(`🔒 Unlock with: ${o.locked(b.dataset.v)}`);
   set.look[o.k] = b.dataset.v;
   saveSet();
   applyLook();

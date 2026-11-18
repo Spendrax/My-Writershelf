@@ -302,6 +302,12 @@ body.snap .view {
   font-style: normal;
   font-size: 28px;
 }
+.medal small {
+  display: block;
+  margin-top: 2px;
+  font-size: 10px;
+  color: var(--dim);
+}
 .medal.got {
   opacity: 1;
 }

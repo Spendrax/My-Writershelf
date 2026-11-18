@@ -2,12 +2,13 @@
 // Google's sign-in needs a secret that can't be put in the app itself, so these two steps happen here:
 //   POST /gauth    trades Google's one-time sign-in code for a lasting token
 //   POST /gtoken   trades that lasting token for a short pass (about an hour)
+//   GET  /where    roughly where you are (your city), from Cloudflare, for the real weather in the window
 //   /ping          "are you there?": open it in a browser to check the helper's version
 // Nothing is stored here. Only the app's own site may use it, at most 60 requests a minute per connection.
 // Set up (see README → "Setting up Google"): two secrets in Cloudflare → this Worker → Settings →
 // Variables and Secrets: GOOGLE_ID (the OAuth client ID) and GOOGLE_SECRET (the client secret).
 
-const HELPER_VERSION = 1;
+const HELPER_VERSION = 2;
 const APP = 'https://spendrax.github.io';
 
 // Counts requests per connection over the last minute (kept in this server's memory, so it's a soft limit)
@@ -33,6 +34,9 @@ export default {
     // only the app may use the helper (browsers always say which site is asking)
     if (request.headers.get('Origin') !== APP) return reply({ error: 'forbidden' }, 403);
     if (tooMany(request.headers.get('CF-Connecting-IP') || '')) return reply({ error: 'busy' }, 429);
+
+    // Cloudflare already knows roughly where each request comes from; only the city-level position is sent back
+    if (url.pathname === '/where') return reply({ lat: request.cf?.latitude ?? null, lon: request.cf?.longitude ?? null });
 
     if (request.method === 'POST' && (url.pathname === '/gauth' || url.pathname === '/gtoken')) {
       const v = (await request.text()).trim();

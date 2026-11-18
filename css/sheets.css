@@ -264,6 +264,29 @@ dialog.write[open] {
   color: var(--dim);
   font: 14px/1.6 Georgia, serif;
 }
+/* the Doc's paragraphs: tap one to change it; changed ones are marked until they're saved */
+#wDoc {
+  flex: 3 1 120px;
+  color: var(--ink);
+}
+#wDoc p {
+  margin: 0 0 0.7em;
+  border-radius: 4px;
+}
+#wDoc p.h {
+  font-weight: 700;
+  font-size: 16px;
+}
+#wDoc p.fixed {
+  color: var(--dim);
+}
+#wDoc p[contenteditable] {
+  outline: 1px dashed var(--line);
+  background: #ffffff08;
+}
+#wDoc p.edited {
+  box-shadow: -4px 0 0 var(--led);
+}
 #wText {
   flex: 2 1 120px;
   resize: none;
@@ -293,6 +316,10 @@ body.looking .view {
 .swatches button {
   border: 1px solid #ffffff33;
   box-shadow: none;
+}
+/* a hat not won yet */
+.seg button.locked {
+  opacity: 0.45;
 }
 /* "no rug" */
 .swatches button[data-v='none'] {

@@ -27,7 +27,7 @@
 <main>
   <!-- The attic: slanted roof, string lights, today's note pinned to the wall, the shelf of books, the buddy -->
   <section id="view-attic" class="view on">
-    <div class="roof" aria-hidden="true"><i class="lights"></i><i class="porthole"></i></div>
+    <div class="roof"><i class="lights" aria-hidden="true"></i><button class="porthole" aria-label="Window: the weather outside"></button></div>
     <div id="todayNote" class="pinned"></div>
     <div id="shelf" class="shelf"></div>
     <div class="floor">
@@ -85,14 +85,14 @@
   </form>
 </dialog>
 
-<!-- Write here: what you type is added at the end of the Google Doc -->
+<!-- Open and write: the whole Google Doc — tap a paragraph to change it, keep writing at the bottom (10-write.js) -->
 <dialog id="dlgWrite" class="sheet write">
   <div class="sheet-h"><h2 id="wTitle"></h2><button class="x" data-close aria-label="Close">✕</button></div>
-  <div id="wCtx" class="ctx"></div>
-  <textarea id="wText" rows="9" placeholder="Keep writing…"></textarea>
+  <div id="wDoc" class="ctx"></div>
+  <textarea id="wText" rows="5" placeholder="Keep writing…"></textarea>
   <p class="dim small" id="wCount"></p>
-  <button id="wSend" class="btn primary wide">Add to my Google Doc</button>
-  <p class="dim small">Your text is added at the end of the Doc. To change what’s already written, open Google Docs. Until it’s sent, your text is kept on this phone.</p>
+  <button id="wSend" class="btn primary wide">Save to my Google Doc</button>
+  <p class="dim small">Tap a paragraph to change it. Until it’s saved, your writing is kept on this phone.</p>
 </dialog>
 
 <!-- Customize: a short sheet with no dark backdrop, so the attic stays in view while you choose -->
@@ -152,5 +152,8 @@
 <script src="js/15-languages.js"></script>
 <script src="js/16-buddy-moves.js"></script>
 <script src="js/17-customize.js"></script>
+<script src="js/18-weather.js"></script>
+<script src="js/19-achievements.js"></script>
+<script src="js/20-buddy-play.js"></script>
 </body>
 </html>

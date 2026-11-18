@@ -48,6 +48,8 @@
 }
 /* the round window, with the moon */
 .porthole {
+  padding: 0;
+  cursor: pointer;
   position: absolute;
   right: 26px;
   top: 52px;
@@ -71,6 +73,24 @@
     radial-gradient(ellipse 12px 5px at 40% 62%, #fff 95%, transparent),
     radial-gradient(circle at 68% 34%, #fff3b0 0 6px, transparent 7px),
     linear-gradient(#5aa9e6, #b5dcf5);
+}
+[data-sky='clouds'] .porthole {
+  background:
+    radial-gradient(ellipse 14px 7px at 36% 58%, #f4f6f8 95%, transparent),
+    radial-gradient(ellipse 12px 6px at 64% 40%, #e3e8ee 95%, transparent),
+    linear-gradient(#8fa3b8, #c3cfdb);
+}
+[data-sky='snow'] .porthole {
+  background:
+    radial-gradient(circle, #fff 0 1.4px, transparent 2px) 0 0 / 11px 11px,
+    radial-gradient(circle, #fff 0 1px, transparent 1.5px) 5px 6px / 9px 9px,
+    linear-gradient(#7d8a99, #c9d2dc);
+  animation: snowfall 3s linear infinite;
+}
+@keyframes snowfall {
+  to {
+    background-position: 0 22px, 5px 24px, 0 0;
+  }
 }
 [data-sky='rain'] .porthole {
   background:
