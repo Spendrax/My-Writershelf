@@ -8,6 +8,7 @@
 // closes or you're offline; they're cleared once Google confirms they're in the Doc.
 // If the Doc was changed somewhere else since you opened it, Google refuses the save (nothing is overwritten)
 // and the app opens the new version, keeping your changes so you can save them again.
+// Pictures show as they are, but a paragraph with a picture can only be changed in Google Docs.
 // shortcut: text is shown plain (headings stand out, bold/italics don't show), and bold or italics inside a
 // paragraph you change are lost in that paragraph. Upgrade: read and send the text styles too.
 
@@ -23,25 +24,54 @@ function loadDraft(b) {
 
 /* ---------- Reading the Doc ---------- */
 
-// The Doc as a list of paragraphs. start/end are Google's positions; a paragraph that holds a picture, or a
-// table, is shown but can't be changed here (fixed).
+// The Doc as a list of paragraphs. start/end are Google's positions. A paragraph that holds a picture, or a
+// table, is shown as it is (pictures included) but can't be changed here (fixed).
 async function readDoc(b) {
   const d = await (await gfetch(`https://docs.googleapis.com/v1/documents/${b.doc}`)).json();
   const paras = (d.body?.content || []).reduce((list, el) => {
     if (el.table) return list.concat({ text: '▦', fixed: true });
-    if (!el.paragraph) return list;
-    const parts = el.paragraph.elements || [];
-    const text = parts.reduce((t, p) => t + (p.textRun?.content || ''), '').replace(/\n$/, '');
-    return list.concat({
-      start: el.startIndex,
-      end: el.endIndex,
-      text,
-      h: /HEADING|TITLE/.test(el.paragraph.paragraphStyle?.namedStyleType || ''),
-      brk: parts.some((p) => p.pageBreak), // a page break (often between chapters)
-      fixed: parts.some((p) => !p.textRun),
-    });
+    return el.paragraph ? list.concat(paraOf(el, d)) : list;
   }, []);
   return { rev: d.revisionId, paras };
+}
+
+// A picture in the Doc, as an <img>. Google gives each one a private address that works for about
+// 30 minutes, only for you; it's not kept anywhere (reopening the book gets fresh ones).
+function picture(obj) {
+  const e = obj?.embeddedObject;
+  const src = e?.imageProperties?.contentUri;
+  if (!src) return '';
+  const w = e.size?.width?.magnitude; // in points
+  return `<img src="${esc(src)}" alt="${esc(e.title || e.description || '')}" loading="lazy"${w ? ` style="width:${Math.round(w * 1.333)}px"` : ''}>`;
+}
+
+// One paragraph: its text, and for a paragraph with pictures, how to show it (html)
+function paraOf(el, d) {
+  const parts = el.paragraph.elements || [];
+  const text = parts.reduce((t, p) => t + (p.textRun?.content || ''), '').replace(/\n$/, '');
+  const fixed = parts.some((p) => !p.textRun) || !!el.paragraph.positionedObjectIds?.length;
+  const html = fixed
+    ? parts.reduce((h, p) => {
+        if (p.textRun) return h + esc(p.textRun.content.replace(/\n$/, ''));
+        const id = p.inlineObjectElement?.inlineObjectId;
+        return h + (id ? picture(d.inlineObjects?.[id]?.inlineObjectProperties) : '');
+      }, '') +
+      // pictures placed freely on the page (in front of or behind the text) belong to a paragraph too
+      (el.paragraph.positionedObjectIds || []).reduce(
+        (h, id) => h + picture(d.positionedObjects?.[id]?.positionedObjectProperties),
+        '',
+      )
+    : '';
+  return {
+    start: el.startIndex,
+    end: el.endIndex,
+    text,
+    html,
+    h: /HEADING|TITLE/.test(el.paragraph.paragraphStyle?.namedStyleType || ''),
+    brk: parts.some((p) => p.pageBreak), // a page break (often between chapters)
+    pic: html.includes('<img'),
+    fixed,
+  };
 }
 
 // Keeps what's waiting to be saved, with the version of the Doc it was written on
@@ -57,12 +87,13 @@ const docText = (w, edits) => w.paras.reduce((t, p, i) => t + (edits[i] ?? p.tex
 // Empty lines after your last line aren't shown, so the Doc ends where your writing ends
 function drawDoc() {
   const edits = loadDraft(writing.b).edits;
-  const shown = (p, i) => (edits[i] ?? p.text).trim() || p.fixed;
+  const shown = (p, i) => (edits[i] ?? p.text).trim() || p.pic || p.fixed;
   const last = writing.paras.reduce((n, p, i) => (shown(p, i) ? i : n), -1);
   $('#wDoc').innerHTML = writing.paras.slice(0, last + 1).reduce((h, p, i) => {
     const text = edits[i] ?? p.text;
-    const kind = [p.h && 'h', p.brk && 'brk', p.fixed && 'fixed', !text.trim() && 'blank', edits[i] != null && 'edited'];
-    return h + `<p data-i="${i}" class="${kind.filter(Boolean).join(' ')}">${p.brk ? '' : esc(text) || '<br>'}</p>`;
+    const kind = [p.h && 'h', p.brk && 'brk', p.fixed && 'fixed', !text.trim() && !p.pic && 'blank', edits[i] != null && 'edited'];
+    const shows = p.brk ? '' : p.pic ? p.html : esc(text) || '<br>';
+    return h + `<p data-i="${i}" class="${kind.filter(Boolean).join(' ')}">${shows}</p>`;
   }, '');
 }
 

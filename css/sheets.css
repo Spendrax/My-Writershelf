@@ -280,6 +280,14 @@ dialog.write[open] {
 #wDoc p.fixed {
   color: var(--dim);
 }
+/* pictures from the Doc: their own size, never wider than the sheet */
+#wDoc img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0.4em auto;
+  border-radius: 4px;
+}
 /* an empty line takes less room than a written one */
 #wDoc p.blank {
   margin: 0;

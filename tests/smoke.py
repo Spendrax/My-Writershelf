@@ -195,6 +195,10 @@ with sync_playwright() as p:
     assert pg.evaluate('document.documentElement.dataset.sky') == 'snow'
     pg.click('.porthole'); assert pg.inner_text('#toast') == '-2° · Snow'
     # Open and write: the whole Doc, change a paragraph, add at the end, save
+    # (a paragraph with a picture shows the picture, with its text; it can't be changed here)
+    pic = pg.evaluate('''paraOf({startIndex: 5, endIndex: 9, paragraph: {elements: [{textRun: {content: 'Map '}}, {inlineObjectElement: {inlineObjectId: 'i1'}}, {textRun: {content: '\\n'}}]}},
+      {inlineObjects: {i1: {inlineObjectProperties: {embeddedObject: {imageProperties: {contentUri: 'https://lh3.example/pic'}, size: {width: {magnitude: 300}}}}}}})''')
+    assert pic['fixed'] and pic['pic'] and pic['html'].startswith('Map <img src="https://lh3.example/pic"') and 'width:400px' in pic['html'], pic
     assert pg.evaluate("writing = {b: byId('b1'), paras: [{text: 'a'}, {text: ''}, {text: 'b'}, {text: ''}, {text: '  '}]}; drawDoc(); [...$$('#wDoc p')].map(p => p.className)") == ['', 'blank', ''], 'no empty lines after the last one'
     pg.click('.spine'); pg.click('[data-do=write]'); pg.wait_for_timeout(500)
     assert pg.evaluate("[...$$('#wDoc p')].map(p => p.className + ':' + p.innerText.slice(0, 11))") == ['h:Chapter One', ':word word w']
