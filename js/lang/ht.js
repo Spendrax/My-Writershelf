@@ -192,6 +192,8 @@ LANG.ht = {
     "The window shows the real weather outside. Tap it for the temperature": "Fenèt la montre vrè tan an deyò a. Peze l pou wè tanperati a",
     "Play with your buddy: tap it, tap it twice, hold your finger on it to pet it, or tap the floor to call it": "Jwe ak konpayon ou: peze l, peze l de fwa, kenbe dwèt ou sou li pou karese l, oswa peze planche a pou rele l",
     "Hats for your buddy, won with medals": "Chapo pou konpayon ou, ou genyen yo ak meday",
+    "Picture: open the book in Google Docs to see it": "Foto: louvri liv la nan Google Docs pou wè l",
+    "This picture couldn’t load. Close the book and open it again.": "Foto sa a pa t ka parèt. Fèmen liv la epi louvri l ankò.",
   },
   tpl: {
     "Unlock with: {1}": "Ou debloke l ak: {1}",

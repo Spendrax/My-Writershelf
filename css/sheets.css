@@ -280,6 +280,19 @@ dialog.write[open] {
 #wDoc p.fixed {
   color: var(--dim);
 }
+/* a picture that can't be shown here */
+#wDoc .nopic {
+  display: block;
+  padding: 0.6em;
+  border: 1px dashed var(--line);
+  border-radius: 6px;
+  font: 13px var(--ui, system-ui);
+  color: var(--dim);
+}
+#wDoc hr {
+  border: 0;
+  border-top: 1px solid var(--line);
+}
 /* pictures from the Doc: their own size, never wider than the sheet */
 #wDoc img {
   display: block;

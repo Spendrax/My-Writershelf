@@ -24,53 +24,67 @@ function loadDraft(b) {
 
 /* ---------- Reading the Doc ---------- */
 
-// The Doc as a list of paragraphs. start/end are Google's positions. A paragraph that holds a picture, or a
-// table, is shown as it is (pictures included) but can't be changed here (fixed).
+// The Doc as a list of paragraphs. start/end are Google's positions. A paragraph that holds a picture, a table
+// or another special thing is shown as it is but can't be changed here (fixed).
+// (A Doc with tabs: Google gives the first tab in the usual places; older answers are read from tabs[0] too.)
 async function readDoc(b) {
   const d = await (await gfetch(`https://docs.googleapis.com/v1/documents/${b.doc}`)).json();
-  const paras = (d.body?.content || []).reduce((list, el) => {
-    if (el.table) return list.concat({ text: '▦', fixed: true });
-    return el.paragraph ? list.concat(paraOf(el, d)) : list;
+  const tab = d.tabs?.[0]?.documentTab || {};
+  const objects = { inline: d.inlineObjects || tab.inlineObjects || {}, positioned: d.positionedObjects || tab.positionedObjects || {} };
+  const paras = ((d.body || tab.body)?.content || []).reduce((list, el) => {
+    if (el.table) return list.concat({ text: '▦', html: '▦', fixed: true });
+    return el.paragraph ? list.concat(paraOf(el, objects)) : list;
   }, []);
   return { rev: d.revisionId, paras };
 }
 
 // A picture in the Doc, as an <img>. Google gives each one a private address that works for about
 // 30 minutes, only for you; it's not kept anywhere (reopening the book gets fresh ones).
+// No address (a drawing, a chart…): a note saying to look at it in Google Docs.
+const NO_PIC = '<span class="nopic">🖼 Picture: open the book in Google Docs to see it</span>';
 function picture(obj) {
   const e = obj?.embeddedObject;
   const src = e?.imageProperties?.contentUri;
-  if (!src) return '';
+  if (!src) return NO_PIC;
   const w = e.size?.width?.magnitude; // in points
   return `<img src="${esc(src)}" alt="${esc(e.title || e.description || '')}" loading="lazy"${w ? ` style="width:${Math.round(w * 1.333)}px"` : ''}>`;
 }
 
-// One paragraph: its text, and for a paragraph with pictures, how to show it (html)
-function paraOf(el, d) {
+// Text from the Doc, ready to show: a line break inside a paragraph (Shift+Enter, which Google sends as a
+// "vertical tab") becomes a real line break; other invisible marks Google uses are left out
+const showText = (t) =>
+  esc(t.replace(/\n$/, ''))
+    .replace(/\v/g, '<br>')
+    .replace(/[\u0000-\u0008\u000c-\u001f\ue000-\uf8ff\ufffc]/g, '');
+
+// How each kind of thing in a paragraph shows
+function showPart(p, objects) {
+  if (p.textRun) return showText(p.textRun.content);
+  if (p.inlineObjectElement) return picture(objects.inline[p.inlineObjectElement.inlineObjectId]?.inlineObjectProperties);
+  if (p.horizontalRule) return '<hr>';
+  if (p.footnoteReference) return `<sup>${esc(p.footnoteReference.footnoteNumber)}</sup>`;
+  if (p.person) return esc(p.person.personProperties?.name || p.person.personProperties?.email);
+  if (p.richLink) return esc(p.richLink.richLinkProperties?.title);
+  if (p.dateElement) return esc(p.dateElement.dateElementProperties?.displayText);
+  return ''; // a page break, a column break, an equation…
+}
+
+// One paragraph: its text (what you change), and how to show it (html)
+function paraOf(el, objects) {
   const parts = el.paragraph.elements || [];
-  const text = parts.reduce((t, p) => t + (p.textRun?.content || ''), '').replace(/\n$/, '');
-  const fixed = parts.some((p) => !p.textRun) || !!el.paragraph.positionedObjectIds?.length;
-  const html = fixed
-    ? parts.reduce((h, p) => {
-        if (p.textRun) return h + esc(p.textRun.content.replace(/\n$/, ''));
-        const id = p.inlineObjectElement?.inlineObjectId;
-        return h + (id ? picture(d.inlineObjects?.[id]?.inlineObjectProperties) : '');
-      }, '') +
-      // pictures placed freely on the page (in front of or behind the text) belong to a paragraph too
-      (el.paragraph.positionedObjectIds || []).reduce(
-        (h, id) => h + picture(d.positionedObjects?.[id]?.positionedObjectProperties),
-        '',
-      )
-    : '';
+  const placed = el.paragraph.positionedObjectIds || []; // pictures placed freely on the page (in front of or behind the text)
+  const html =
+    parts.reduce((h, p) => h + showPart(p, objects), '') +
+    placed.reduce((h, id) => h + picture(objects.positioned[id]?.positionedObjectProperties), '');
   return {
     start: el.startIndex,
     end: el.endIndex,
-    text,
+    text: parts.reduce((t, p) => t + (p.textRun?.content || ''), '').replace(/\n$/, ''),
     html,
     h: /HEADING|TITLE/.test(el.paragraph.paragraphStyle?.namedStyleType || ''),
     brk: parts.some((p) => p.pageBreak), // a page break (often between chapters)
-    pic: html.includes('<img'),
-    fixed,
+    pic: /<img|nopic|<hr/.test(html),
+    fixed: parts.some((p) => !p.textRun) || placed.length > 0,
   };
 }
 
@@ -87,12 +101,12 @@ const docText = (w, edits) => w.paras.reduce((t, p, i) => t + (edits[i] ?? p.tex
 // Empty lines after your last line aren't shown, so the Doc ends where your writing ends
 function drawDoc() {
   const edits = loadDraft(writing.b).edits;
-  const shown = (p, i) => (edits[i] ?? p.text).trim() || p.pic || p.fixed;
+  const shown = (p, i) => (edits[i] ?? p.text).replace(/\v/g, '').trim() || p.pic || p.fixed;
   const last = writing.paras.reduce((n, p, i) => (shown(p, i) ? i : n), -1);
   $('#wDoc').innerHTML = writing.paras.slice(0, last + 1).reduce((h, p, i) => {
     const text = edits[i] ?? p.text;
-    const kind = [p.h && 'h', p.brk && 'brk', p.fixed && 'fixed', !text.trim() && !p.pic && 'blank', edits[i] != null && 'edited'];
-    const shows = p.brk ? '' : p.pic ? p.html : esc(text) || '<br>';
+    const kind = [p.h && 'h', p.brk && 'brk', p.fixed && 'fixed', !text.replace(/\v/g, '').trim() && !p.pic && 'blank', edits[i] != null && 'edited'];
+    const shows = p.brk ? '' : (edits[i] != null ? showText(text) : p.html) || '<br>';
     return h + `<p data-i="${i}" class="${kind.filter(Boolean).join(' ')}">${shows}</p>`;
   }, '');
 }
@@ -144,13 +158,20 @@ $('#wDoc').oninput = (e) => {
   const p = e.target.closest('p[data-i]');
   const draft = loadDraft(writing.b);
   const i = p.dataset.i;
-  const text = p.innerText.replace(/\n$/, '');
+  const text = p.innerText.replace(/\n$/, '').replace(/\n/g, '\v'); // a new line here stays in this paragraph, like Shift+Enter
   if (text === writing.paras[i].text) delete draft.edits[i];
   else draft.edits[i] = text;
   p.classList.toggle('edited', draft.edits[i] != null);
   keepDraft(draft);
   drawCount();
 };
+
+// A picture whose address stopped working (after about 30 minutes): a note instead
+$('#wDoc').addEventListener(
+  'error',
+  (e) => e.target.tagName === 'IMG' && e.target.replaceWith(Object.assign(document.createElement('span'), { className: 'nopic', textContent: '🖼 This picture couldn’t load. Close the book and open it again.' })),
+  true,
+);
 
 $('#wText').oninput = () => {
   const draft = loadDraft(writing.b);

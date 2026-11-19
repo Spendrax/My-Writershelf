@@ -192,6 +192,8 @@ LANG.es = {
     "The window shows the real weather outside. Tap it for the temperature": "La ventana muestra el tiempo real afuera. Tócala para ver la temperatura",
     "Play with your buddy: tap it, tap it twice, hold your finger on it to pet it, or tap the floor to call it": "Juega con tu compañero: tócalo, tócalo dos veces, mantén el dedo encima para acariciarlo o toca el suelo para llamarlo",
     "Hats for your buddy, won with medals": "Sombreros para tu compañero, ganados con medallas",
+    "Picture: open the book in Google Docs to see it": "Imagen: abre el libro en Google Docs para verla",
+    "This picture couldn’t load. Close the book and open it again.": "Esta imagen no se pudo cargar. Cierra el libro y ábrelo de nuevo.",
   },
   tpl: {
     "Unlock with: {1}": "Se desbloquea con: {1}",

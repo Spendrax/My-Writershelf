@@ -192,6 +192,8 @@ LANG.de = {
     "The window shows the real weather outside. Tap it for the temperature": "Das Fenster zeigt das echte Wetter draußen. Tippe darauf für die Temperatur",
     "Play with your buddy: tap it, tap it twice, hold your finger on it to pet it, or tap the floor to call it": "Spiel mit deinem Begleiter: Tippe ihn an, tippe zweimal, halte den Finger auf ihm, um ihn zu streicheln, oder tippe auf den Boden, um ihn zu rufen",
     "Hats for your buddy, won with medals": "Hüte für deinen Begleiter, gewonnen mit Medaillen",
+    "Picture: open the book in Google Docs to see it": "Bild: Öffne das Buch in Google Docs, um es zu sehen",
+    "This picture couldn’t load. Close the book and open it again.": "Dieses Bild konnte nicht laden. Schließ das Buch und öffne es erneut.",
   },
   tpl: {
     "Unlock with: {1}": "Freischalten mit: {1}",
