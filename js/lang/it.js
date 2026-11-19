@@ -194,6 +194,7 @@ LANG.it = {
     "Hats for your buddy, won with medals": "Cappelli per il tuo compagno, vinti con le medaglie",
     "Picture: open the book in Google Docs to see it": "Immagine: apri il libro in Google Docs per vederla",
     "This picture couldn’t load. Close the book and open it again.": "Questa immagine non si è caricata. Chiudi il libro e riaprilo.",
+    "A picture placed behind or in front of the text. Google only shows it in Google Docs": "Un’immagine dietro o davanti al testo. Google la mostra solo in Google Docs",
   },
   tpl: {
     "Unlock with: {1}": "Si sblocca con: {1}",

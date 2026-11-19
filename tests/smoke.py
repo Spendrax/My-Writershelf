@@ -195,6 +195,8 @@ with sync_playwright() as p:
     assert pg.evaluate('document.documentElement.dataset.sky') == 'snow'
     pg.click('.porthole'); assert pg.inner_text('#toast') == '-2° · Snow'
     # Open and write: the whole Doc, change a paragraph, add at the end, save
+    behind = pg.evaluate("paraOf({startIndex: 1, endIndex: 7, paragraph: {elements: [{textRun: {content: '\\ue907ZETA\\n'}}]}}, {inline: {}, positioned: {}})")
+    assert behind['fixed'] and 'behind or in front' in behind['html'] and behind['html'].endswith('ZETA'), 'a picture behind the text: a note, and the paragraph is kept safe'
     # (a paragraph with a picture shows the picture, with its text; it can't be changed here)
     pic = pg.evaluate('''paraOf({startIndex: 5, endIndex: 9, paragraph: {elements: [{textRun: {content: '\\u000bMap '}}, {inlineObjectElement: {inlineObjectId: 'i1'}}, {inlineObjectElement: {inlineObjectId: 'i2'}}, {textRun: {content: '\\n'}}]}},
       {inline: {i1: {inlineObjectProperties: {embeddedObject: {imageProperties: {contentUri: 'https://lh3.example/pic'}, size: {width: {magnitude: 300}}}}}, i2: {inlineObjectProperties: {embeddedObject: {}}}}, positioned: {}})''')

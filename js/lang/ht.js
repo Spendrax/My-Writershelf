@@ -194,6 +194,7 @@ LANG.ht = {
     "Hats for your buddy, won with medals": "Chapo pou konpayon ou, ou genyen yo ak meday",
     "Picture: open the book in Google Docs to see it": "Foto: louvri liv la nan Google Docs pou wè l",
     "This picture couldn’t load. Close the book and open it again.": "Foto sa a pa t ka parèt. Fèmen liv la epi louvri l ankò.",
+    "A picture placed behind or in front of the text. Google only shows it in Google Docs": "Yon foto ki mete dèyè oswa devan tèks la. Google montre l sèlman nan Google Docs",
   },
   tpl: {
     "Unlock with: {1}": "Ou debloke l ak: {1}",

@@ -51,10 +51,16 @@ function picture(obj) {
 }
 
 // Text from the Doc, ready to show: a line break inside a paragraph (Shift+Enter, which Google sends as a
-// "vertical tab") becomes a real line break; other invisible marks Google uses are left out
+// "vertical tab") becomes a real line break; other invisible marks Google uses are left out.
+// A picture placed behind or in front of the text reaches apps only as a mark (U+E907) with no picture:
+// Google doesn't give apps those pictures, so a note says so.
+const BEHIND = '\ue907';
+const NO_BEHIND =
+  '<span class="nopic">🖼 A picture placed behind or in front of the text. Google only shows it in Google Docs</span>';
 const showText = (t) =>
   esc(t.replace(/\n$/, ''))
     .replace(/\v/g, '<br>')
+    .replace(new RegExp(BEHIND, 'g'), NO_BEHIND)
     .replace(/[\u0000-\u0008\u000c-\u001f\ue000-\uf8ff\ufffc]/g, '');
 
 // How each kind of thing in a paragraph shows
@@ -84,7 +90,8 @@ function paraOf(el, objects) {
     h: /HEADING|TITLE/.test(el.paragraph.paragraphStyle?.namedStyleType || ''),
     brk: parts.some((p) => p.pageBreak), // a page break (often between chapters)
     pic: /<img|nopic|<hr/.test(html),
-    fixed: parts.some((p) => !p.textRun) || placed.length > 0,
+    // changing a paragraph holding such a picture would delete the picture: only in Google Docs
+    fixed: parts.some((p) => !p.textRun || p.textRun.content.includes(BEHIND)) || placed.length > 0,
   };
 }
 
