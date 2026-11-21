@@ -175,6 +175,31 @@ with sync_playwright() as p:
     pg.evaluate("window.asked=0; dispatchEvent(Object.assign(new Event('beforeinstallprompt'), {prompt(){asked++}, userChoice: Promise.resolve({outcome:'accepted'})}))")
     pg.click('#btnInstall'); pg.wait_for_timeout(100)
     assert pg.evaluate('asked') == 1 and pg.is_hidden('#btnInstall')
+    # --- the room: light by time, seasons, storms, a decoration for each medal won
+    assert pg.evaluate("[timeOfDay(new Date(2026, 0, 1, 23)), timeOfDay(new Date(2026, 0, 1, 12)), timeOfDay(new Date(2026, 0, 1, 7, 10))]") == ['night', 'day', 'dawn']
+    assert pg.evaluate("[9, 11, 1, 3].map(m => SEASONS.find(s => s.when(m, 10))?.id)") == ['halloween', 'winter', 'valentine', None]
+    assert pg.evaluate("emit('change'); $$('#shelf .trinket').length") >= 1, 'the medal for petting put a teddy bear on the shelf'
+    pg.evaluate("set.look.sky = 'storm'; applyLook()"); assert pg.evaluate("document.documentElement.dataset.sky") == 'storm' and pg.evaluate('!!flashT')
+    pg.evaluate("set.look.sky = 'night'; applyLook()")
+    # --- the buddy's life: a trick, the yarn, levels, hello
+    pg.evaluate("$('#view-attic').scrollTo(0, 1e6); clearTimeout(petTimer); pet.className = 'pet'"); pg.wait_for_timeout(300)
+    assert pg.evaluate("(() => { const r = Math.random; Math.random = () => 0; const ok = idleTrick(); Math.random = r; return [ok, pet.classList.contains('yawn')] })()") == [True, True]
+    pg.wait_for_timeout(2000); pg.evaluate("clearTimeout(petTimer)"); pg.click('#yarn', force=True)
+    pg.wait_for_function("pet.classList.contains('bat')", timeout=15000)
+    pg.evaluate("clearTimeout(petTimer); books[0].words = 12600; save()"); pg.wait_for_timeout(200)
+    got = pg.evaluate("[buddyLevel(), set.level, !!$('.confetti'), $('#bubble').textContent, allWords()]"); assert got[:3] == [6, 6, True] and got[3] in ('⭐ Level 6!', '🎩 New hat: Beanie'), got  # (level 5 was reached by an earlier book; the 10,000-word medal may speak after)
+    assert 'Level 6' in pg.text_content('#goalsBody') and 'Dances' in pg.text_content('#goalsBody')
+    pg.evaluate("set.seen = Date.now() - 7 * 36e5; greet()"); pg.wait_for_timeout(2700)
+    assert pg.inner_text('#bubble') == '💛 You’re back!'
+    # --- writing helpers: the sprint, the prompt, the calendar
+    pg.click('#sprintBtn'); pg.click('[data-min="10"]'); pg.wait_for_timeout(300)
+    assert pg.is_visible('#sprintBar') and '9:5' in pg.inner_text('#sprintBar')
+    pg.evaluate("set.sprint.from -= 100; set.sprint.end = Date.now() - 1; tickSprint()"); pg.wait_for_timeout(500)
+    assert pg.evaluate("[set.sprint, set.sprints.count, set.sprints.best]") == [None, 1, 100] and pg.is_hidden('#sprintBar')
+    assert pg.inner_text('#bubble') == '🎉 Sprint done: +100 words!'
+    before = pg.inner_text('#promptNote'); pg.click('#promptNote'); assert pg.inner_text('#promptNote') != before
+    assert pg.evaluate("$$('.cal i.c3').length") >= 1
+    pg.evaluate("$('.cal i.c3').click()"); assert pg.inner_text('#toast').endswith('words')
     pg.click('#btnSettings'); assert pg.is_visible('#gConnect')  # Google is set up, not connected yet
     assert not pg.errs, pg.errs
 
@@ -221,6 +246,15 @@ with sync_playwright() as p:
     assert doc['paras'][0] == 'Chapter One' and pg.evaluate("load('ws.draft.b1').edits[0]") == 'Chapter 1'
     pg.click('#wSend'); pg.wait_for_timeout(800)
     assert doc['paras'][0] == 'Chapter 1' and pg.evaluate('byId("b1").words') == 154
+    # while writing, your buddy peeks in and cheers each 100 words
+    pg.fill('#wText', ' '.join(['more'] * 105)); pg.dispatch_event('#wText', 'input')
+    assert pg.evaluate("$('#peek').classList.contains('talk') && $('#peek .bubble').textContent") == '🎉 +100 words!'
+    pg.fill('#wText', ''); pg.dispatch_event('#wText', 'input')
+    pg.click('#dlgWrite [data-close]')
+    # the chapters on the book card, and opening the book at one
+    pg.click('.spine'); pg.wait_for_selector('.chap')
+    got = pg.evaluate("[[...$$('.chap')].map(c => c.innerText.replace(/\\s+/g, ' ')), byId('b1').chapters]"); assert got == [['Chapter 1 152'], 1], got
+    pg.click('.chap'); pg.wait_for_timeout(500); assert pg.evaluate("$('#dlgWrite').open && writing.b.id") == 'b1'
     pg.click('#dlgWrite [data-close]')
     pg.evaluate('refreshAll()'); pg.wait_for_timeout(500)
     assert pg.evaluate('[byId("b1").words, wroteToday()]') == [154, 54], 'reading the Doc again counts nothing twice'

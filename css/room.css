@@ -1,0 +1,275 @@
+/* THE ROOM COMES ALIVE (js/21-room-life.js) — the light by time of day, the weather inside, seasonal
+   decorations, shelf decorations, plus the daily prompt note (js/24-prompts.js) and the sprint (js/23-sprint.js).
+   html[data-time] is night, dawn, day or dusk · html[data-sky] is what the window shows · html[data-season] */
+
+/* ---------- The light ---------- */
+/* a beam of light from the round window down across the wall, with dust floating in it */
+.sunbeam {
+  position: absolute;
+  z-index: 1;
+  top: 70px;
+  right: 10px;
+  width: 260px;
+  height: 520px;
+  pointer-events: none;
+  background: linear-gradient(200deg, #fff3c455, #fff3c411 60%, transparent);
+  clip-path: polygon(78% 0, 100% 4%, 45% 100%, 0 92%);
+  opacity: 0;
+  transition: opacity 3s;
+}
+[data-time='day'] .sunbeam {
+  opacity: 1;
+}
+[data-time='dawn'] .sunbeam,
+[data-time='dusk'] .sunbeam {
+  opacity: 1;
+  background: linear-gradient(200deg, #ffad6b66, #ff8a5011 60%, transparent);
+}
+/* no sun through rain, clouds or snow, nor through a window showing the night */
+[data-sky='rain'] .sunbeam,
+[data-sky='storm'] .sunbeam,
+[data-sky='snow'] .sunbeam,
+[data-sky='clouds'] .sunbeam,
+[data-sky='night'] .sunbeam {
+  opacity: 0;
+}
+.sunbeam i {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #fff8dc;
+  opacity: 0.7;
+  animation: dust linear infinite;
+}
+@keyframes dust {
+  25% {
+    transform: translate(10px, -14px);
+  }
+  50% {
+    transform: translate(-6px, -26px);
+    opacity: 0.3;
+  }
+  75% {
+    transform: translate(8px, -10px);
+  }
+}
+/* at night the walls are darker and the string lights glow more */
+[data-time='night'] .view {
+  background: color-mix(in srgb, var(--wall) 70%, #000);
+}
+[data-time='night'] .lights {
+  filter: drop-shadow(0 0 4px var(--led)) drop-shadow(0 0 14px var(--led));
+}
+[data-time='day'] .view {
+  background: color-mix(in srgb, var(--wall) 88%, #c9a27a);
+}
+
+/* ---------- The weather inside ---------- */
+/* rain runs down the window */
+[data-sky='rain'] .porthole,
+[data-sky='storm'] .porthole {
+  animation: rainfall 0.6s linear infinite;
+}
+@keyframes rainfall {
+  to {
+    background-position: 0 14px, 0 0;
+  }
+}
+[data-sky='storm'] .porthole {
+  background:
+    repeating-linear-gradient(105deg, transparent 0 4px, #ffffff66 4px 5px),
+    linear-gradient(#20242c, #3b4350);
+}
+/* snow piles up on the window's sill */
+[data-sky='snow'] .porthole::after {
+  content: '';
+  position: absolute;
+  left: -8px;
+  right: -8px;
+  bottom: -9px;
+  height: 9px;
+  border-radius: 9px 9px 2px 2px;
+  background: #f4f7fb;
+}
+[data-sky='snow'] .porthole {
+  overflow: visible;
+}
+/* a lightning flash over everything */
+.flash {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  background: #e8f0ff;
+  opacity: 0;
+}
+.flash.on {
+  animation: flash 0.9s ease-out;
+}
+@keyframes flash {
+  5%,
+  22% {
+    opacity: 0.55;
+  }
+  12%,
+  40% {
+    opacity: 0.05;
+  }
+  30% {
+    opacity: 0.35;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* ---------- Decorations for the season ---------- */
+.deco {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+#decoWall {
+  z-index: 2;
+  height: 150px;
+}
+#decoWall i {
+  position: absolute;
+  top: 8px;
+  font-style: normal;
+  filter: drop-shadow(0 2px 2px #0008);
+}
+#decoFloor i {
+  position: absolute;
+  bottom: 50px;
+  font-style: normal;
+  filter: drop-shadow(0 3px 2px #0008);
+}
+/* December: the string lights turn every colour */
+[data-season='winter'] .lights {
+  background:
+    radial-gradient(circle at 50% 5px, #ff5a5a 0 3px, transparent 4px) 0 0 / 144px 16px repeat-x,
+    radial-gradient(circle at 50% 5px, #6bff8a 0 3px, transparent 4px) 36px 0 / 144px 16px repeat-x,
+    radial-gradient(circle at 50% 5px, #6bb8ff 0 3px, transparent 4px) 72px 0 / 144px 16px repeat-x,
+    radial-gradient(circle at 50% 5px, #ffd36b 0 3px, transparent 4px) 108px 0 / 144px 16px repeat-x;
+}
+
+/* ---------- Medal decorations on the shelf ---------- */
+.trinket {
+  align-self: flex-end;
+  padding: 0 2px;
+  font-size: 34px;
+  line-height: 1;
+  background: none;
+  filter: drop-shadow(0 3px 2px #0009);
+}
+
+/* ---------- The daily prompt: a small sticky note on the attic wall (js/24-prompts.js) ---------- */
+.prompt-note {
+  position: relative;
+  z-index: 2;
+  display: block;
+  width: 62%;
+  margin: 14px 18px 0 auto;
+  padding: 10px 12px 12px;
+  border-radius: 2px;
+  background: #fff1a8;
+  color: #3a2c10;
+  text-align: left;
+  font: 14px/1.35 Georgia, serif;
+  transform: rotate(1.5deg);
+  box-shadow: 0 5px 10px #0008;
+}
+.prompt-note b {
+  display: block;
+  margin-bottom: 3px;
+  font: 700 11px var(--ui, system-ui);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.65;
+}
+/* a strip of tape holding it */
+.prompt-note::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 40%;
+  width: 46px;
+  height: 16px;
+  background: #ffffff66;
+  transform: rotate(-4deg);
+}
+
+/* ---------- The writing sprint (js/23-sprint.js) ---------- */
+.sprint-btn {
+  margin-top: 6px;
+  padding: 6px 10px;
+  border-radius: 99px;
+  background: #2a1c1018;
+  color: inherit;
+  font: 600 13px var(--ui, system-ui);
+}
+.sprint-len {
+  margin-top: 12px;
+}
+.sprint-bar {
+  position: fixed;
+  z-index: 30;
+  top: calc(env(safe-area-inset-top) + 64px);
+  left: 50%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 8px 6px 14px;
+  border-radius: 99px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  box-shadow: 0 6px 16px #000a;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: 14px;
+}
+.sprint-bar[hidden] {
+  display: none;
+}
+.sprint-bar b {
+  font: 700 18px var(--hd);
+  font-variant-numeric: tabular-nums;
+}
+.sprint-bar .x {
+  width: 32px;
+  height: 32px;
+}
+/* the candle: its wax gets shorter as time runs out, the flame flickers */
+.candle {
+  position: relative;
+  width: 12px;
+  height: 30px;
+}
+.candle::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 12px;
+  height: calc(4px + var(--wax) * 0.22);
+  border-radius: 3px 3px 2px 2px;
+  background: linear-gradient(90deg, #f3e6c8, #fffaf0 40%, #d9c9a6);
+}
+.candle i {
+  position: absolute;
+  left: 3px;
+  bottom: calc(4px + var(--wax) * 0.22);
+  width: 6px;
+  height: 9px;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  background: radial-gradient(circle at 50% 70%, #fff6c4, #ffb347 60%, #ff7a1a);
+  box-shadow: 0 0 8px #ffb347;
+  animation: flicker 0.25s ease-in-out infinite alternate;
+}
+@keyframes flicker {
+  to {
+    transform: scale(0.88, 1.08) rotate(3deg);
+  }
+}

@@ -88,6 +88,7 @@ function paraOf(el, objects) {
     text: parts.reduce((t, p) => t + (p.textRun?.content || ''), '').replace(/\n$/, ''),
     html,
     h: /HEADING|TITLE/.test(el.paragraph.paragraphStyle?.namedStyleType || ''),
+    lvl: +(el.paragraph.paragraphStyle?.namedStyleType || '').replace(/\D/g, '') || 0, // 1 for Heading 1… (0 for the title)
     brk: parts.some((p) => p.pageBreak), // a page break (often between chapters)
     pic: /<img|nopic|<hr/.test(html),
     // changing a paragraph holding such a picture would delete the picture: only in Google Docs
@@ -125,9 +126,11 @@ function drawCount() {
   const waiting = draft.more.trim() || Object.keys(draft.edits).length;
   $('#wCount').textContent = `${num(total)} words in the book · ${num(today)} / ${num(set.goal)} today`;
   $('#wSend').disabled = !waiting;
+  emit('writing', total); // the buddy peeking in cheers you on (22-buddy-life.js)
 }
 
-async function openWrite(b) {
+// at: a paragraph to open at (a chapter, from the book card); otherwise it opens at the end
+async function openWrite(b, at) {
   writing = { b, rev: '', paras: [] };
   $('#wTitle').textContent = b.title;
   $('#wDoc').innerHTML = '<p class="dim">…</p>';
@@ -150,7 +153,9 @@ async function openWrite(b) {
   }
   drawDoc();
   drawCount();
-  $('#wDoc').scrollTop = 1e7; // where you left off
+  const start = at != null && $(`#wDoc p[data-i="${at}"]`);
+  if (start) $('#wDoc').scrollTop = start.offsetTop - $('#wDoc').offsetTop;
+  else $('#wDoc').scrollTop = 1e7; // where you left off
 }
 
 // Tap a paragraph: it becomes editable
@@ -229,6 +234,7 @@ $('#wSend').onclick = async () => {
   localStorage.removeItem(draftKey(b));
   $('#wText').value = '';
   toast('Saved to your Google Doc');
+  emit('saved');
   await refreshBook(b, true, true).catch(() => {}); // the new word count, and today's words
   save();
   if (writing.b === b && $('#dlgWrite').open) openWrite(b);

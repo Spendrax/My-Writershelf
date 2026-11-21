@@ -10,6 +10,7 @@ function drawToday() {
     <p class="big"><b>${num(n)}</b> / ${num(set.goal)} words</p>
     <div class="meter"><i style="width:${Math.min(100, (n / set.goal) * 100)}%"></i></div>
     <p class="row2"><span>${done ? '✅ Daily goal done!' : `${num(set.goal - n)} words to go`}</span><span>🔥 ${streak()}</span></p>
+    <button class="sprint-btn" id="sprintBtn">⏱ Writing sprint</button>
     ${books.some((b) => b.doc) ? '<button class="resync" id="resync" aria-label="Read the word count again">⟳</button>' : ''}`;
 }
 

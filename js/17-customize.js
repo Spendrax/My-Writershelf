@@ -15,7 +15,7 @@ const LOOKS = [
     name: 'Window',
     see: 'top',
     on: 'attic',
-    names: { live: 'Real weather', day: 'Day', night: 'Night', dusk: 'Sunset', clouds: 'Clouds', rain: 'Rain', snow: 'Snow' },
+    names: { live: 'Real weather', day: 'Day', night: 'Night', dusk: 'Sunset', clouds: 'Clouds', rain: 'Rain', storm: 'Thunderstorm', snow: 'Snow' },
   },
   {
     k: 'kind',

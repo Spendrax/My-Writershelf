@@ -20,18 +20,19 @@ Live at https://spendrax.github.io/My-Writershelf/
 | `index.html` | The page: the attic, the walls and every pop-up sheet |
 | `css/base.css` | Colours (the string-light colour is `--led`), fonts, top bar, form fields |
 | `css/attic.css` | Roof, string lights, round window and its views, today's pinned note, the shelf and spines, the floor (the same on the three walls) and the rug |
-| `css/buddy.css` | The buddy: its colours, blinking, tail, walking legs, moods, speech bubble |
+| `css/buddy.css` | The buddy: its colours, blinking, tail, walking legs, moods, tricks, speech bubble, yarn, confetti |
+| `css/room.css` | Light by time of day, weather inside, seasonal decorations, shelf decorations, the prompt note, the sprint bar |
 | `css/walls.css` | Turning the walls, the + button, wall dots, Update button, cards on the Goals and Stats walls |
 | `css/sheets.css` | Pop-up sheets, buttons, toast, the book card, the "Write here" sheet, Customize |
 | `js/01-core.js` | Saving books and settings, events, helpers, the word log / daily goal / streak, drawing a spine |
 | `js/02-google.js` | Google sign-in and talking to Google. **The Google client ID and API key go here** |
 | `js/03-docs.js` | Picking Google Docs, reading their word counts (on open, on return, on ⟳) |
 | `js/04-book-form.js` | The add/edit form, removing a book |
-| `js/05-book-card.js` | The card shown when you tap a book |
+| `js/05-book-card.js` | The card shown when you tap a book, with its chapters (from the Doc's headings) |
 | `js/06-attic.js` | Today's note and the shelf |
 | `js/07-turning-walls.js` | Swiping round the hexagon: Goals ← Attic → Stats |
 | `js/08-buddy.js` | The buddy: drawing each animal (the `ANIMALS` list) and its hats (`HATS`), its moods, what it says |
-| `js/09-goals-stats.js` | The Goals wall and the Stats wall (medals are the `MEDALS` list; each one wins a hat) |
+| `js/09-goals-stats.js` | The Goals wall and the Stats wall: medals (`MEDALS`, each wins a hat and a shelf decoration), the writing calendar |
 | `js/10-write.js` | Open and write: the whole Google Doc, change any paragraph, keep writing at the end, save |
 | `js/11-settings-backup.js` | Settings, saving and loading a backup file |
 | `js/12-drive-backup.js` | Automatic Google Drive backup and syncing between devices |
@@ -42,6 +43,10 @@ Live at https://spendrax.github.io/My-Writershelf/
 | `js/18-weather.js` | The real weather in the attic's window (place from the helper, weather from Open-Meteo) |
 | `js/19-achievements.js` | Noticing new medals and unlocking their hats |
 | `js/20-buddy-play.js` | Playing with the buddy: tap, double tap, petting, tap the floor to call it |
+| `js/21-room-life.js` | Light by time of day, rain/lightning/snow inside, rain and thunder sounds, seasons, medal decorations |
+| `js/22-buddy-life.js` | The buddy's levels and tricks (`TRICKS`), butterfly, hello, yarn ball, peeking while you write, confetti |
+| `js/23-sprint.js` | Writing sprints with the candle bar |
+| `js/24-prompts.js` | The idea of the day (`PROMPTS`) |
 | `js/15-languages.js`, `js/lang/` | The app in French, Spanish, Haitian Creole, Portuguese, German, Italian |
 | `tools/cloudflare-helper.js` | This app's own Cloudflare Worker: the Google sign-in, and your rough position for the weather |
 | `sw.js` | The offline copy. Bump `V` on every release, and list any new file in `SHELL` |

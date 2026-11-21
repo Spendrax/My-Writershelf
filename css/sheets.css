@@ -361,3 +361,33 @@ body.looking .view {
 .seg button.on {
   --sc: var(--led);
 }
+
+/* ---------- Chapters on the book card ---------- */
+.chapters h3 {
+  margin: 14px 0 6px;
+}
+.chap {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 9px 8px;
+  border-bottom: 1px solid var(--line);
+  background: none;
+  color: var(--ink);
+  text-align: left;
+  font-size: 14px;
+}
+.chap small {
+  color: var(--dim);
+  white-space: nowrap;
+}
+/* a tick box in Settings */
+label.check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+label.check input {
+  width: auto;
+}

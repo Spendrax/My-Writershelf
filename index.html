@@ -15,6 +15,7 @@
 <link rel="stylesheet" href="css/base.css">
 <link rel="stylesheet" href="css/attic.css">
 <link rel="stylesheet" href="css/buddy.css">
+<link rel="stylesheet" href="css/room.css">
 <link rel="stylesheet" href="css/walls.css">
 <link rel="stylesheet" href="css/sheets.css">
 </head>
@@ -28,10 +29,16 @@
   <!-- The attic: slanted roof, string lights, today's note pinned to the wall, the shelf of books, the buddy -->
   <section id="view-attic" class="view on">
     <div class="roof"><i class="lights" aria-hidden="true"></i><button class="porthole" aria-label="Window: the weather outside"></button></div>
+    <!-- light through the window, dust in it, and the season's decorations (21-room-life.js) -->
+    <i class="sunbeam" aria-hidden="true"></i>
+    <div id="decoWall" class="deco" aria-hidden="true"></div>
     <div id="todayNote" class="pinned"></div>
+    <button id="promptNote" class="prompt-note" aria-label="Today’s writing prompt"></button>
     <div id="shelf" class="shelf"></div>
     <div class="floor">
       <i class="rug"></i>
+      <div id="decoFloor" class="deco" aria-hidden="true"></div>
+      <button id="yarn" class="yarn" aria-label="Yarn ball: throw it for your buddy"></button>
       <button class="bowl" aria-label="Food bowl: call your buddy"></button>
       <!-- the buddy: drawn by 08-buddy.js, walked around (and to the other walls' floors) by 16-buddy-moves.js -->
       <div id="pet" class="pet" role="button" tabindex="0" aria-label="Your buddy"><span class="bubble" id="bubble"></span><div class="pv" id="petArt"></div></div>
@@ -87,7 +94,7 @@
 
 <!-- Open and write: the whole Google Doc — tap a paragraph to change it, keep writing at the bottom (10-write.js) -->
 <dialog id="dlgWrite" class="sheet write">
-  <div class="sheet-h"><h2 id="wTitle"></h2><button class="x" data-close aria-label="Close">✕</button></div>
+  <div class="sheet-h"><h2 id="wTitle"></h2><div id="peek" class="peek" aria-hidden="true"><span class="bubble"></span><div class="pv"></div></div><button class="x" data-close aria-label="Close">✕</button></div>
   <div id="wDoc" class="ctx"></div>
   <textarea id="wText" rows="5" placeholder="Keep writing…"></textarea>
   <p class="dim small" id="wCount"></p>
@@ -100,6 +107,13 @@
   <div class="sheet-h"><h2>Customize</h2><button class="x" data-close aria-label="Close">✕</button></div>
   <div id="cBody"></div>
   <label>Your buddy’s name<input id="cPet" maxlength="24"></label>
+</dialog>
+
+<!-- Writing sprint: how long (23-sprint.js) -->
+<dialog id="dlgSprint" class="sheet">
+  <div class="sheet-h"><h2>Writing sprint</h2><button class="x" data-close aria-label="Close">✕</button></div>
+  <p class="dim">Write as much as you can before the candle burns down: in Google Docs or with Open and write. Your words are counted by themselves.</p>
+  <div class="seg sprint-len"><button data-min="10">10 min</button><button data-min="15">15 min</button><button data-min="25">25 min</button></div>
 </dialog>
 
 <!-- What's new -->
@@ -121,6 +135,7 @@
     <button class="btn ghost" id="gOff">Disconnect</button>
   </div>
   <h3>Display</h3>
+  <label class="check"><input type="checkbox" id="sSound"> Sounds (rain, thunder)</label>
   <label>Language<select id="sLang"><option value="auto">Automatic</option><option value="en">English</option><option value="fr">Français</option><option value="es">Español</option><option value="ht">Kreyòl ayisyen</option><option value="pt">Português</option><option value="de">Deutsch</option><option value="it">Italiano</option></select></label>
   <h3>Backup</h3>
   <p class="dim">Your shelf lives on this phone. Save a backup now and then.</p>
@@ -133,6 +148,8 @@
   <p class="dim small">My Writershelf v<span id="ver"></span> · <a href="privacy.html">Privacy</a></p>
 </dialog>
 
+<i id="flash" class="flash" aria-hidden="true"></i>
+<div id="sprintBar" class="sprint-bar" hidden></div>
 <div id="toast" role="status"></div>
 
 <script src="js/01-core.js"></script>
@@ -155,5 +172,9 @@
 <script src="js/18-weather.js"></script>
 <script src="js/19-achievements.js"></script>
 <script src="js/20-buddy-play.js"></script>
+<script src="js/21-room-life.js"></script>
+<script src="js/22-buddy-life.js"></script>
+<script src="js/23-sprint.js"></script>
+<script src="js/24-prompts.js"></script>
 </body>
 </html>

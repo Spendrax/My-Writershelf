@@ -15,7 +15,7 @@ const CONDITIONS = [
   { codes: [61, 63, 65, 66, 67], view: 'rain', name: 'Rain' },
   { codes: [80, 81, 82], view: 'rain', name: 'Showers' },
   { codes: [71, 73, 75, 77, 85, 86], view: 'snow', name: 'Snow' },
-  { codes: [95, 96, 99], view: 'rain', name: 'Thunderstorm' },
+  { codes: [95, 96, 99], view: 'storm', name: 'Thunderstorm' },
 ];
 const conditionOf = (code) => CONDITIONS.find((c) => c.codes.includes(code)) || CONDITIONS[0];
 
@@ -30,7 +30,7 @@ set.weather ||= {}; // { lat, lon, placeAt, at, code, day, temp, view }
 // What the window shows from the last weather read: rain and snow first, sunset/sunrise light, then day or night
 function liveView(w) {
   const c = conditionOf(w.code);
-  if (c.view === 'rain' || c.view === 'snow') return c.view;
+  if (['rain', 'snow', 'storm'].includes(c.view)) return c.view;
   if (w.dusk) return 'dusk';
   if (!w.day) return 'night';
   return c.view === 'clouds' ? 'clouds' : 'day';
@@ -55,10 +55,13 @@ async function readWeather() {
     // the times are all in the place's own time zone, so they compare with each other directly
     const now = Date.parse(d.current.time);
     const nearSun = [d.daily.sunrise[0], d.daily.sunset[0]].some((t) => Math.abs(Date.parse(t) - now) < 45 * 6e4);
-    Object.assign(w, { at: Date.now(), code: d.current.weather_code, day: !!d.current.is_day, temp: Math.round(d.current.temperature_2m), dusk: nearSun });
+    // sunrise and sunset as minutes after midnight, for the light in the attic (21-room-life.js)
+    const minutes = (t) => +t.slice(11, 13) * 60 + +t.slice(14, 16);
+    Object.assign(w, { at: Date.now(), code: d.current.weather_code, day: !!d.current.is_day, temp: Math.round(d.current.temperature_2m), dusk: nearSun, sun: [minutes(d.daily.sunrise[0]), minutes(d.daily.sunset[0])] });
     w.view = liveView(w);
     saveSet();
     showWeather();
+    emit('weather');
   } catch {} // no weather right now: the window keeps showing the last one
 }
 

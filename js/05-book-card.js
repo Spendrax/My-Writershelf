@@ -1,5 +1,7 @@
 'use strict';
-// BOOK CARD — shown when you tap a book: how far it is, and the buttons to write, open the Doc, refresh, edit.
+// BOOK CARD — shown when you tap a book: how far it is, its chapters, and the buttons to write, open the Doc,
+// refresh, edit. The chapters come from the headings in the Google Doc, each with its number of words;
+// tap one to open the book right there.
 
 function openBook(id) {
   const b = byId(id);
@@ -16,17 +18,60 @@ function openBook(id) {
       b.doc
         ? `<button class="btn primary wide" data-do="write">📖 Open and write</button>
            <a class="btn wide" href="${docLink(b)}" target="_blank" rel="noopener">📄 Open in Google Docs</a>
-           <button class="btn ghost wide" data-do="refresh">⟳ Read the word count again</button>`
+           <button class="btn ghost wide" data-do="refresh">⟳ Read the word count again</button>
+           <div id="bChapters" class="chapters"></div>`
         : ''
     }
     <button class="btn ghost wide" data-do="edit">Edit</button>`;
   $('#bBody').dataset.id = id;
   if (!$('#dlgBook').open) $('#dlgBook').showModal();
+  if (b.doc && googleOn()) drawChapters(b);
+}
+
+// The headings of the Doc (that aren't empty), each with the words written under it until the next heading
+function chaptersOf(paras) {
+  return paras.reduce((list, p, i) => {
+    if (p.h && p.text.trim()) return list.concat({ i, name: p.text.replace(/\v/g, ' ').trim(), lvl: p.lvl, words: 0 });
+    if (list.length) list[list.length - 1].words += countWords(p.text);
+    return list;
+  }, []);
+}
+
+// chapters named like one (Chapter, Chapitre, Capítulo…), or else every heading, count as chapters
+const CHAPTER_WORD = /chap|cap[ií]t|kapitel|chapit/i;
+
+async function drawChapters(b) {
+  const box = $('#bChapters');
+  box.innerHTML = '<p class="dim small">…</p>';
+  let doc;
+  try {
+    doc = await readDoc(b);
+  } catch {
+    return (box.innerHTML = '');
+  }
+  if ($('#bBody').dataset.id !== b.id) return; // another book was opened meanwhile
+  const list = chaptersOf(doc.paras);
+  if (!list.length) return (box.innerHTML = '');
+  const top = list.reduce((m, c) => Math.min(m, c.lvl || 1), 9); // the biggest heading level used
+  box.innerHTML =
+    '<h3>Chapters</h3>' +
+    list.reduce(
+      (h, c) =>
+        h + `<button class="chap" data-at="${c.i}" style="padding-left:${8 + Math.max(0, (c.lvl || 1) - top) * 14}px"><span>${esc(c.name)}</span><small>${num(c.words)}</small></button>`,
+      '',
+    );
+  const named = list.reduce((n, c) => n + CHAPTER_WORD.test(c.name), 0);
+  countChapters(b, named || list.length); // a new chapter since last time: a little party (22-buddy-life.js)
 }
 
 $('#bBody').onclick = async (e) => {
   const what = e.target.closest('[data-do]')?.dataset.do;
   const b = byId($('#bBody').dataset.id);
+  const chap = e.target.closest('.chap');
+  if (chap && b) {
+    $('#dlgBook').close();
+    return openWrite(b, +chap.dataset.at);
+  }
   if (!what || !b) return;
   if (what === 'refresh') {
     try {

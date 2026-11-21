@@ -5,6 +5,16 @@
 
 const NEWS = [
   {
+    v: '1.6',
+    items: [
+      '\u2600\uFE0F The attic follows the time of day: sunbeams and dust by day, glowing lights at night',
+      '\u{1F327}\uFE0F Rain on the window, lightning in storms, snow on the sill, and rain sounds (Settings \u2192 Sounds)',
+      '\u{1F383} Decorations for the seasons, and a decoration on the shelf for each medal',
+      '\u{1F408} Your buddy yawns, stretches, chases butterflies, plays with its yarn, sleeps, says hello, and grows with your words',
+      '\u23F1 Writing sprints with a candle, chapters for each book, a writing calendar and an idea of the day',
+    ],
+  },
+  {
     v: '1.5',
     items: [
       '\u{1F4D6} Open and write: read your whole Google Doc in the app, tap a paragraph to change it, and keep writing at the end',

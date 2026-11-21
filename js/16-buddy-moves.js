@@ -80,6 +80,7 @@ function petGo(k, x = somewhere(), then = restPet) {
 // sometimes it jumps up onto something, or explores the wall next door
 function wanderPet() {
   if (pet.classList.contains('asleep')) return restPet(60e3);
+  if (Math.random() < 0.3 && idleTrick()) return; // a little trick where it is (22-buddy-life.js)
   if (where.y && Math.random() < 0.5) return restPet();
   hopDown(() => {
     const yours = WALLS[view];
@@ -101,7 +102,7 @@ on('view', () => busy() || restPet(1500 + Math.random() * 2500));
 
 function surfaces() {
   const wall = floorOf(where.wall).closest('.view');
-  const tops = $$('.pinned, .card, .kpi', wall).reduce((list, el, i) => {
+  const tops = $$('.pinned, .prompt-note, .card, .kpi', wall).reduce((list, el, i) => {
     const r = el.getBoundingClientRect();
     return list.concat({ top: r.top, left: r.left, right: r.right, on: 'thing' + i });
   }, []);

@@ -125,6 +125,7 @@ function petSVG(kind, hat) {
       <path class="mouth line" d="M43.5 27.200q1.4 1.7 2.8 0q1.4 1.7 2.8 0"/>
       <path class="smile" d="M43.6 27q2.7 4.6 5.4 0z" fill="#c2455a" stroke="#2a1c10" stroke-width=".8" stroke-linejoin="round"/>
       <path class="frown line" d="M44 29q2.3-2 4.6 0"/>
+      <ellipse class="yawnm" cx="46.3" cy="28.6" rx="2.3" ry="3.2" fill="#7a2b28"/>
       <g class="hat">${HATS[hat]?.svg || ''}</g>
     </g>
   </svg>`;
