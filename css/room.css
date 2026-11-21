@@ -3,17 +3,19 @@
    html[data-time] is night, dawn, day or dusk · html[data-sky] is what the window shows · html[data-season] */
 
 /* ---------- The light ---------- */
-/* a beam of light from the round window down across the wall, with dust floating in it */
+/* a beam of light from the round window down across the wall, with dust floating in it.
+   Its top edge is the window's glass (the window is 58px wide, 32px from the right, its middle 87px down,
+   see .porthole in css/attic.css), and the window is drawn over it */
 .sunbeam {
   position: absolute;
   z-index: 1;
-  top: 70px;
-  right: 10px;
-  width: 260px;
-  height: 520px;
+  top: 87px;
+  right: 32px;
+  width: 300px;
+  height: 540px;
   pointer-events: none;
   background: linear-gradient(200deg, #fff3c455, #fff3c411 60%, transparent);
-  clip-path: polygon(78% 0, 100% 4%, 45% 100%, 0 92%);
+  clip-path: polygon(80.7% 0, 100% 0, 45% 100%, 0 92%);
   opacity: 0;
   transition: opacity 3s;
 }
@@ -94,6 +96,10 @@
 }
 [data-sky='snow'] .porthole {
   overflow: visible;
+}
+/* the window in front of its own light */
+#view-attic .porthole {
+  z-index: 2;
 }
 /* a lightning flash over everything */
 .flash {
