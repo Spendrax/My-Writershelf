@@ -1,5 +1,5 @@
 // Offline copy. Bump V on every release.
-const V = 'ws-v19';
+const V = 'ws-v20';
 const SHELL = [
   './', 'index.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png',
   'css/base.css',
@@ -32,6 +32,7 @@ const SHELL = [
   'js/22-buddy-life.js',
   'js/23-sprint.js',
   'js/24-prompts.js',
+  'js/25-reminder.js',
   'js/lang/fr.js',
   'js/lang/es.js',
   'js/lang/ht.js',
@@ -44,7 +45,8 @@ self.addEventListener('install', e => e.waitUntil(caches.open(V).then(c => c.add
 // the page's "Update now" button asks the new version to take over
 self.addEventListener('message', e => { if (e.data === 'skip') self.skipWaiting(); });
 self.addEventListener('activate', e => {
-  e.waitUntil(caches.keys().then(ks => Promise.all(ks.reduce((a, k) => k !== V ? a.concat(caches.delete(k)) : a, []))));
+  // old copies go; 'ws-push' (the reminder's words, written by the app) stays
+  e.waitUntil(caches.keys().then(ks => Promise.all(ks.reduce((a, k) => k !== V && k !== 'ws-push' ? a.concat(caches.delete(k)) : a, []))));
   self.clients.claim();
 });
 self.addEventListener('fetch', e => {
@@ -57,4 +59,20 @@ self.addEventListener('fetch', e => {
     const net = fetch(r).then(res => { if (res.ok || res.type === 'opaque') c.put(r, res.clone()); return res; }).catch(() => hit);
     return hit || net;
   })));
+});
+
+// The daily reminder (js/25-reminder.js, tools/reminders.js): the helper's push carries no words, so the
+// notification's words are the ones the app last wrote in the 'ws-push' cache, in your language
+self.addEventListener('push', e => e.waitUntil(
+  caches.open('ws-push').then(c => c.match('msg')).then(r => r ? r.json() : null).catch(() => null).then(m =>
+    self.registration.showNotification((m && m.title) || '✍️ Time to write', {
+      body: (m && m.body) || 'Your buddy is waiting in the attic',
+      icon: 'icon-192.png',
+      badge: 'icon-192.png',
+      tag: 'write', // a new one replaces yesterday's
+    }))));
+// tapping it opens the app (or brings it forward if it's already open)
+self.addEventListener('notificationclick', e => {
+  e.notification.close();
+  e.waitUntil(self.clients.matchAll({ type: 'window' }).then(ws => ws.length ? ws[0].focus() : self.clients.openWindow('./')));
 });

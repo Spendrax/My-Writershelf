@@ -59,12 +59,56 @@ async function addDocs(docs) {
 /* ---------- Word counts ---------- */
 
 // Reads one Doc again if it changed since last time. force: read it anyway.
+// counts: new words go on the log, on the day they were written (spreadWords).
 async function refreshBook(b, counts = true, force = false) {
   const meta = await (await gfetch(`drive/v3/files/${b.doc}?fields=modifiedTime`)).json();
   if (!force && meta.modifiedTime === b.docTime) return;
   const text = await (await gfetch(`drive/v3/files/${b.doc}/export?mimeType=text/plain`)).text();
+  const n = countWords(text);
+  const since = b.docTime; // the version read last time
   b.docTime = meta.modifiedTime;
-  setWords(b, countWords(text), counts);
+  if (!counts || !since || n === (b.words || 0)) return setWords(b, n, counts);
+  // if the earlier versions can't be read, all the new words go on the day of the last change
+  await spreadWords(b, n, since).catch(() => setWords(b, n, true, dayOf(new Date(meta.modifiedTime))));
+}
+
+/* ---------- Words on the day they were written ---------- */
+// Google keeps the Doc's earlier versions, each with the time it was saved. The changes since the app last read
+// the Doc are grouped by day; for each day but the last, the word count at the end of that day is read from
+// that day's last version (through the helper, since Google doesn't let a web page read it directly).
+// So writing at 11 pm and opening the app the next morning counts for the night you wrote.
+
+const EXACT_DAYS = 7; // older changes than this go on the oldest of these days
+
+async function versionsSince(b, since) {
+  let list = [];
+  let page = '';
+  do {
+    const d = await (
+      await gfetch(`drive/v3/files/${b.doc}/revisions?pageSize=1000&fields=nextPageToken,revisions(modifiedTime,exportLinks)${page && '&pageToken=' + page}`)
+    ).json();
+    list = list.concat(d.revisions || []);
+    page = d.nextPageToken || '';
+  } while (page);
+  return list.reduce((l, r) => (Date.parse(r.modifiedTime) > Date.parse(since) ? l.concat(r) : l), []);
+}
+
+async function spreadWords(b, n, since) {
+  // the last version of each day, oldest day first
+  const lastOfDay = (await versionsSince(b, since)).reduce((m, r) => m.set(dayOf(new Date(r.modifiedTime)), r), new Map());
+  const days = [...lastOfDay.keys()].slice(-EXACT_DAYS);
+  for (const day of days.slice(0, -1)) {
+    const link = lastOfDay.get(day).exportLinks?.['text/plain'];
+    if (!link) throw new Error('no version');
+    const r = await fetch(HELPER + '/gexport', {
+      method: 'POST',
+      body: JSON.stringify({ url: link, token: await googleAccess() }),
+      signal: AbortSignal.timeout(20000),
+    });
+    if (!r.ok) throw new Error('version ' + r.status);
+    setWords(b, countWords(await r.text()), true, day);
+  }
+  setWords(b, n, true, days[days.length - 1] || today());
 }
 
 let refreshing = false;

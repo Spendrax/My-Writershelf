@@ -6,3 +6,12 @@ main = "tools/cloudflare-helper.js"
 compatibility_date = "2026-01-01"
 keep_vars = true   # keep anything set by hand in the dashboard
 workers_dev = true
+
+# Where the daily reminders are kept (tools/reminders.js). Made in Cloudflare as "My writershelf reminders".
+[[kv_namespaces]]
+binding = "REMIND"
+id = "e27d4fab0705427ca394a8f95cc73ba0"
+
+# Every 15 minutes: send the reminders whose time has come
+[triggers]
+crons = ["*/15 * * * *"]

@@ -38,6 +38,10 @@ def fake_google(route):
         return route.fulfill(status=204, headers={'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': '*', 'Access-Control-Allow-Methods': '*'})
     if '/gtoken' in u: return ok({'access_token': 'pass', 'expires_in': 3600})
     if '/where' in u: return ok({'lat': 45.5, 'lon': -73.6})
+    if '/revisions' in u: return ok({'revisions': doc.get('revs', [])})
+    if '/gexport' in u:  # an earlier version of the Doc, read through the helper
+        assert route.request.post_data_json['token'] == 'pass'
+        return route.fulfill(status=200, content_type='text/plain', body=doc['old'], headers={'Access-Control-Allow-Origin': '*'})
     if ':batchUpdate' in u:
         body = route.request.post_data_json
         if body['writeControl']['requiredRevisionId'] != doc['rev']:  # changed elsewhere: Google refuses
@@ -200,6 +204,18 @@ with sync_playwright() as p:
     before = pg.inner_text('#promptNote'); pg.click('#promptNote'); assert pg.inner_text('#promptNote') != before
     assert pg.evaluate("$$('.cal i.c3').length") >= 1
     pg.evaluate("$('.cal i.c3').click()"); assert pg.inner_text('#toast').endswith('words')
+    # --- the daily reminder: subscribes, tells the helper the time, time zone and when today's goal is done
+    told = []
+    pg.route('**/my-writershelf.spendraxapp.workers.dev/reminder', lambda r: (told.append(json.loads(r.request.post_data)),
+        r.fulfill(status=200, content_type='application/json', body='{"ok":true}', headers={'Access-Control-Allow-Origin': '*'})))
+    pg.evaluate("pushSub = async () => ({ toJSON: () => ({ endpoint: 'https://push.example/me' }), unsubscribe: async () => true }); Notification.requestPermission = async () => 'granted'")
+    pg.evaluate("$('#rTime').value = '21:30'; $('#rTime').dispatchEvent(new Event('change')); $('#rOn').checked = true; $('#rOn').dispatchEvent(new Event('change'))")
+    pg.wait_for_timeout(500)
+    assert pg.evaluate('set.remind') == {'on': True, 'time': '21:30'} and told[-1]['time'] == '21:30' and told[-1]['sub']['endpoint'] == 'https://push.example/me' and told[-1]['tz']
+    words = pg.evaluate("caches.open('ws-push').then(c => c.match('msg')).then(r => r.json())")
+    assert words['title'] == '✍️ Time to write' and words['body'], words
+    pg.evaluate("$('#rOn').checked = false; $('#rOn').dispatchEvent(new Event('change'))"); pg.wait_for_timeout(300)
+    assert told[-1]['off'] is True and pg.evaluate('set.remind.on') is False
     pg.click('#btnSettings'); assert pg.is_visible('#gConnect')  # Google is set up, not connected yet
     assert not pg.errs, pg.errs
 
@@ -260,6 +276,20 @@ with sync_playwright() as p:
     assert pg.evaluate('[byId("b1").words, wroteToday()]') == [154, 54], 'reading the Doc again counts nothing twice'
     pg.evaluate("addDocs([{id:'DOC2',name:'Brand new'},{id:'DOC1',name:'Northbound'}])"); pg.wait_for_timeout(500)
     assert pg.evaluate('[books.length, books[0].words, wroteToday()]') == [2, 154, 54], 'a picked Doc’s old words are not today’s'
+    # words written last night, read this morning: they count for last night (the Doc's versions say when)
+    times = pg.evaluate('''(() => { const y = new Date(); y.setDate(y.getDate() - 1); y.setHours(23, 0, 0, 0);
+      const old = new Date(y); old.setDate(old.getDate() - 1); return [old.toISOString(), y.toISOString(), new Date().toISOString(), dayOf(y)] })()''')
+    pg.evaluate(f"byId('b1').docTime = '{times[0]}'")
+    before = pg.evaluate("[byId('b1').words, set.log[today()] || 0, set.log['%s'] || 0]" % times[3])
+    link = 'https://docs.google.com/feeds/download/documents/export/Export?id=DOC1&revision=%d&exportFormat=txt'
+    doc['old'] = full() + ' '.join(['y'] * 30)  # last night's version: 30 more words
+    doc['paras'].append(' '.join(['y'] * 30 + ['z'] * 10))  # and 10 more this morning
+    doc['revs'] = [{'modifiedTime': times[1], 'exportLinks': {'text/plain': link % 7}}, {'modifiedTime': times[2], 'exportLinks': {'text/plain': link % 8}}]
+    doc['time'] = times[2]
+    pg.evaluate(f"books.find(b => b.doc === 'DOC2').docTime = '{times[2]}'")  # (the other book shares the pretend Doc: leave it out)
+    pg.evaluate('refreshAll()'); pg.wait_for_timeout(800)
+    after = pg.evaluate("[byId('b1').words, set.log[today()] || 0, set.log['%s'] || 0]" % times[3])
+    assert after == [before[0] + 40, before[1] + 10, before[2] + 30], (before, after)
     pg.evaluate('driveSync(true)'); pg.wait_for_timeout(500)
     assert pg.evaluate('set.google.file') == 'F1'
     assert not pg.errs, pg.errs

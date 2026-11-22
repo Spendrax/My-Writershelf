@@ -4,7 +4,7 @@
 //   • a tiny event system: emit('change') after any edit, other files listen with on('change', …)
 //   • the word log: how many words you wrote each day, the daily goal and the streak
 //   • small helpers ($, esc, today, …) and spineHTML(), which draws one book on the shelf
-const VERSION = '1.6';
+const VERSION = '1.7';
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 
@@ -83,21 +83,19 @@ function loadScript(src) {
 
 /* ---------- Words, the daily goal and the streak ---------- */
 
-// Gives a book its new word count. The difference goes on today's log, unless counts is false
-// (a book just brought in: the words already in it weren't written today).
-function setWords(b, n, counts = true) {
+// Gives a book its new word count. The difference goes on the log of `day` (today unless the words were
+// written on another day, see 03-docs.js), unless counts is false (a book just brought in: the words
+// already in it weren't written today).
+function setWords(b, n, counts = true, day = today()) {
   const diff = n - (b.words || 0);
   if (!diff) return;
   b.words = n;
   b.updated = Date.now();
   if (!counts) return;
-  // shortcut: words typed in Google Docs land on the day the app reads them, not the day they were typed.
-  // Upgrade if that matters: read the Doc's revision dates.
-  const t = today();
-  set.log[t] = Math.max(0, (set.log[t] || 0) + diff);
-  if (set.log[t] >= set.goal && !set.hit[t]) {
-    set.hit[t] = 1; // stays earned, even if you delete words later or raise the goal
-    emit('goal');
+  set.log[day] = Math.max(0, (set.log[day] || 0) + diff);
+  if (set.log[day] >= set.goal && !set.hit[day]) {
+    set.hit[day] = 1; // stays earned, even if you delete words later or raise the goal
+    if (day === today()) emit('goal');
   }
   saveSet();
 }

@@ -5,6 +5,13 @@
 
 const NEWS = [
   {
+    v: '1.7',
+    items: [
+      '\u{1F4C5} Words you write in Google Docs now count for the day you wrote them, even if you open the app later',
+      '\u{1F514} A daily reminder to write, only on days you haven\u2019t reached your goal (Settings \u2192 Daily reminder)',
+    ],
+  },
+  {
     v: '1.6',
     items: [
       '\u2600\uFE0F The attic follows the time of day: sunbeams and dust by day, glowing lights at night',

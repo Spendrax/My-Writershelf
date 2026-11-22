@@ -9,6 +9,8 @@
 <p>With Google connected, the app also saves a copy of your shelf (book titles, word counts, goals, notes) in a hidden app folder of your own Google Drive, which only this app can see.</p>
 <p>To keep you signed in, the app's sign-in service (on Cloudflare) passes Google's sign-in code and token between the app and Google. It stores nothing; the token stays on your device. You can disconnect at any time in Settings, or remove the app's access in your Google account.</p>
 <p>For the real weather in the attic’s window, the app asks its sign-in service on Cloudflare for your rough position (your city, worked out by Cloudflare from your connection; no location permission is used), then asks Open-Meteo (open-meteo.com) for the weather there. Only that rough position is sent; you can turn this off by picking a view in Customize → Window.</p>
+<p>To count words on the day you wrote them, the app looks at when your picked Docs were saved (their version history) and may read an earlier version of a Doc through its sign-in service on Cloudflare, which passes the text on to your phone without keeping it.</p>
+<p>If you turn on the daily reminder, the app's service on Cloudflare keeps the time you chose, your time zone, whether you reached today's goal, and the address your phone gives for notifications (no name or email). Turning the reminder off deletes it.</p>
 <p>Backups are files you save yourself; they stay wherever you put them.</p>
 <p>Questions: <a href="mailto:spendraxapp@gmail.com">spendraxapp@gmail.com</a></p>
 <p><a href="./">Back to the app</a></p>
