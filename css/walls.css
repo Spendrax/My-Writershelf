@@ -68,13 +68,30 @@ body.snap .view {
   bottom: calc(18px + env(safe-area-inset-bottom));
   width: 58px;
   height: 58px;
+  padding: 0;
   border-radius: 18px;
-  font: 700 30px/1 var(--hd);
+  font-size: 0; /* the + is drawn below (a font's + never sits quite in the middle) */
   color: #1c130b;
   background: var(--led);
   box-shadow:
     0 0 0 4px #17110d,
     0 0 24px var(--led);
+}
+/* the +: two bars crossing in the exact middle */
+.fab::before,
+.fab::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 24px;
+  height: 4px;
+  border-radius: 2px;
+  background: currentColor;
+  transform: translate(-50%, -50%);
+}
+.fab::after {
+  transform: translate(-50%, -50%) rotate(90deg);
 }
 
 .dots {
