@@ -150,7 +150,7 @@ with sync_playwright() as p:
     pg.evaluate("$('#view-attic').scrollTo(0, 1e6); clearTimeout(petTimer)"); pg.wait_for_timeout(200)
     # tap it: a heart; the 25th pet wins the flower crown
     pg.evaluate('set.pets = 24; clearTimeout(petTimer)'); pg.wait_for_timeout(400); pg.click('#pet', force=True)
-    assert pg.evaluate("[!!pet.querySelector('.heart'), set.pets, set.got.includes('pets'), hatUnlocked('flowers'), hatUnlocked('crown')]") == [True, 25, True, True, False]
+    got = pg.evaluate("[!!pet.querySelector('.heart'), set.pets, set.got.includes('pets'), hatUnlocked('flowers'), hatUnlocked('crown'), pet.className, pet.parentElement.className]"); assert got[:5] == [True, 25, True, True, False], got
     # hold a finger on it: petting
     r = pg.evaluate("(r => [r.x + 38, r.y + 40])(pet.getBoundingClientRect())")
     m.move(r[0], r[1]); m.down(); pg.wait_for_timeout(800)

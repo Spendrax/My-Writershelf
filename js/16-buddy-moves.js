@@ -12,7 +12,6 @@
 
 const PET_SPEED = 55; // pixels a second
 const PET_W = 76;
-const PET_H = 78;
 const PET_FLOOR = 50; // how far above the bottom of the floor it stands (css/buddy.css)
 const where = { wall: 0, x: 90, y: 0, on: null };
 let petTimer = 0;
@@ -187,14 +186,9 @@ pet.addEventListener('pointerdown', (e) => {
   hold = { id: e.pointerId, ox: e.clientX - r.left, oy: e.clientY - r.top, sx: e.clientX, sy: e.clientY };
 });
 
-// Where the finger is, as a place on the wall it's on: x from the left of the floor, y above (−) the floor
-function fingerSpot(e) {
-  const f = floorOf(where.wall).getBoundingClientRect();
-  return {
-    x: e.clientX - hold.ox - f.left,
-    y: Math.min(20, e.clientY - hold.oy - (f.bottom - PET_FLOOR - PET_H)),
-  };
-}
+// While you hold it, it's lifted off the wall and follows your finger on the screen itself (class "carried"),
+// so it stays under your finger even while the room turns to another wall
+const follow = (e) => moveTo(e.clientX - hold.ox, e.clientY - hold.oy, 0);
 
 addEventListener('pointermove', (e) => {
   if (!hold || e.pointerId !== hold.id) return;
@@ -204,36 +198,44 @@ addEventListener('pointermove', (e) => {
     clearTimeout(petTimer); // whatever it was doing, it stops
     pet.classList.remove('walk', 'eat');
     $$('.bowl.full').forEach((b) => b.classList.remove('full')); // picked up on its way to eat: no meal
-    pet.classList.add('held');
+    pet.classList.add('held', 'carried');
+    document.body.append(pet);
   }
-  const { x, y } = fingerSpot(e);
-  Object.assign(where, { x, y });
-  moveTo(x, y, 0);
-  // held at the side of the screen for a moment: carried to the wall on that side
+  follow(e);
+  // held at the side of the screen for a moment: the room turns to the wall on that side
   const side = e.clientX < 30 ? -1 : e.clientX > innerWidth - 30 ? 1 : 0;
   if (side === hold.side) return;
   hold.side = side;
   clearTimeout(hold.t);
   const next = where.wall + side;
-  if (side && next >= FIRST && next <= LAST) hold.t = setTimeout(() => carryPet(next), 600);
+  if (side && next >= FIRST && next <= LAST) hold.t = setTimeout(() => carryPet(next), 500);
 });
 
 function carryPet(k) {
   where.wall = k;
-  floorOf(k).append(pet);
-  go(k); // the room turns with you
-  hold.side = 0;
+  go(k); // the room turns; it stays in your hand
+  hold.side = 0; // still at the side once the turn is over: on to the next wall
 }
 
+// Let go: back onto the wall it's over, exactly where it is on the screen, then it falls onto what's below
 function dropPet(e) {
   if (!hold || e.pointerId !== hold.id) return;
   const was = hold;
   hold = null;
   clearTimeout(was.t);
   if (!was.moved) return; // a tap
-  // the tap that follows a drag shouldn't make it talk
-  pet.addEventListener('click', (c) => c.stopImmediatePropagation(), { capture: true, once: true });
-  pet.classList.remove('held');
+  // the tap that may follow a drag shouldn't make it talk (if none comes, the next real tap still counts)
+  const quiet = (c) => c.stopImmediatePropagation();
+  pet.addEventListener('click', quiet, { capture: true, once: true });
+  setTimeout(() => pet.removeEventListener('click', quiet, { capture: true }), 300);
+  const r = pet.getBoundingClientRect();
+  const floor = floorOf(where.wall);
+  const f = floor.getBoundingClientRect();
+  floor.append(pet);
+  pet.classList.remove('held', 'carried');
+  where.x = r.left - f.left;
+  where.y = Math.min(0, r.bottom - (f.bottom - PET_FLOOR));
+  moveTo(where.x, where.y, 0);
   landPet();
   restPet(5000 + Math.random() * 5000);
 }

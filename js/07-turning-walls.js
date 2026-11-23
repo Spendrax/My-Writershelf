@@ -3,6 +3,7 @@
 // Swipe left/right (or tap the dots, or use the arrow keys) to turn:  Goals ← Attic → Stats
 // `cam` is where you're facing: -1 = Goals, 0 = Attic, 1 = Stats (in between while swiping).
 const WALLS = { goals: -1, attic: 0, stats: 1 };
+const TURN_MS = 650; // how long a turn takes (css/walls.css: body.snap .view)
 const FIRST = -1,
   LAST = 1; // the leftmost and rightmost walls
 const wallEls = Object.entries(WALLS).map(([v, k]) => [$('#view-' + v), k]);
@@ -26,13 +27,15 @@ function camSet(c) {
 function go(k, now) {
   if (k !== WALLS[view]) matchWalls();
   document.body.classList.toggle('snap', !now);
+  // both walls stay drawn during the turn (the one you leave doesn't vanish at the start)
+  if (!now) document.body.classList.add('turning');
   camSet(k);
   wallEls.forEach(([el, kk]) => {
     el.inert = kk !== k;
     el.classList.toggle('away', kk !== k);
   });
   clearTimeout(go.t);
-  go.t = setTimeout(() => document.body.classList.remove('turning'), now ? 0 : 400);
+  go.t = setTimeout(() => document.body.classList.remove('turning'), now ? 0 : TURN_MS + 50);
   $$('.dots button').forEach((b) => b.classList.toggle('on', +b.dataset.k === k));
   const v = Object.keys(WALLS).find((w) => WALLS[w] === k);
   if (v !== view) {

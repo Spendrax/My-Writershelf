@@ -145,7 +145,14 @@
   }
 }
 
-/* picked up: above everything on the wall, legs dangling */
+/* picked up: off the wall and on the screen itself, above everything, following your finger */
+.pet.carried {
+  position: fixed;
+  top: 0;
+  bottom: auto;
+  z-index: 40;
+}
+/* legs dangling */
 .pet.held {
   cursor: grabbing;
   z-index: 9;
