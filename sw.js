@@ -1,5 +1,5 @@
 // Offline copy. Bump V on every release.
-const V = 'ws-v24';
+const V = 'ws-v25';
 const SHELL = [
   './', 'index.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png',
   'css/base.css',

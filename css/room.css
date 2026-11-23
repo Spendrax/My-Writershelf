@@ -4,18 +4,19 @@
 
 /* ---------- The light ---------- */
 /* a beam of light from the round window down across the wall, with dust floating in it.
-   Its top edge is the window's glass (the window is 58px wide, 32px from the right, its middle 87px down,
-   see .porthole in css/attic.css), and the window is drawn over it */
+   It starts at the middle of the window's glass (the window is 58px wide, 26px from the right and 52px down,
+   so its middle is 55px from the right and 81px down, see .porthole in css/attic.css): its top edge is 32px
+   wide, centred there, and the window is drawn over it, so the light comes out of the glass */
 .sunbeam {
   position: absolute;
   z-index: 1;
-  top: 87px;
-  right: 32px;
+  top: 81px;
+  right: 39px;
   width: 300px;
-  height: 540px;
+  height: 560px;
   pointer-events: none;
   background: linear-gradient(200deg, #fff3c455, #fff3c411 60%, transparent);
-  clip-path: polygon(80.7% 0, 100% 0, 45% 100%, 0 92%);
+  clip-path: polygon(calc(100% - 32px) 0, 100% 0, 45% 100%, 0 92%);
   opacity: 0;
   transition: opacity 3s;
 }
