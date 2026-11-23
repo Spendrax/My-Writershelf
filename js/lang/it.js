@@ -282,6 +282,9 @@ LANG.it = {
     "Nothing being written right now": "Niente in scrittura al momento",
     "Move to": "Sposta in",
     "A shelf each for the books you’re writing, the ones to continue later, the dropped ones and the finished ones. Move a book from its card": "Uno scaffale per i libri in scrittura, quelli da continuare più tardi, quelli abbandonati e quelli finiti. Sposta un libro dalla sua scheda",
+    "To improve": "Da migliorare",
+    "A shelf each for the books you’re writing, the ones to improve, the ones to continue later, the dropped ones and the finished ones. Move a book from its card": "Uno scaffale per i libri in scrittura, quelli da migliorare, quelli da continuare più tardi, quelli abbandonati e quelli finiti. Sposta un libro dalla sua scheda",
+    "Books look more like books: the more words, the bigger the book": "I libri sembrano più libri: più parole, più grande il libro",
   },
   tpl: {
     "Moved to {1}": "Spostato in {1}",

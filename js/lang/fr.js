@@ -282,6 +282,9 @@ LANG.fr = {
     "Nothing being written right now": "Rien en cours d’écriture pour l’instant",
     "Move to": "Déplacer vers",
     "A shelf each for the books you’re writing, the ones to continue later, the dropped ones and the finished ones. Move a book from its card": "Une étagère pour les livres en cours, ceux à continuer plus tard, ceux abandonnés et ceux terminés. Déplace un livre depuis sa fiche",
+    "To improve": "À améliorer",
+    "A shelf each for the books you’re writing, the ones to improve, the ones to continue later, the dropped ones and the finished ones. Move a book from its card": "Une étagère pour les livres en cours, ceux à améliorer, ceux à continuer plus tard, ceux abandonnés et ceux terminés. Déplace un livre depuis sa fiche",
+    "Books look more like books: the more words, the bigger the book": "Les livres ressemblent plus à des livres : plus il y a de mots, plus le livre est gros",
   },
   tpl: {
     "Moved to {1}": "Déplacé vers {1}",

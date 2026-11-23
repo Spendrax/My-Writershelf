@@ -282,6 +282,9 @@ LANG.de = {
     "Nothing being written right now": "Gerade wird nichts geschrieben",
     "Move to": "Verschieben nach",
     "A shelf each for the books you’re writing, the ones to continue later, the dropped ones and the finished ones. Move a book from its card": "Ein Regalbrett für die Bücher, an denen du schreibst, die für später, die aufgegebenen und die fertigen. Verschiebe ein Buch über seine Karte",
+    "To improve": "Zu verbessern",
+    "A shelf each for the books you’re writing, the ones to improve, the ones to continue later, the dropped ones and the finished ones. Move a book from its card": "Ein Regalbrett für die Bücher, an denen du schreibst, die zu verbessernden, die für später, die aufgegebenen und die fertigen. Verschiebe ein Buch über seine Karte",
+    "Books look more like books: the more words, the bigger the book": "Bücher sehen mehr wie Bücher aus: Je mehr Wörter, desto größer das Buch",
   },
   tpl: {
     "Moved to {1}": "Verschoben nach {1}",

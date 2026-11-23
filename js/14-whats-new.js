@@ -5,8 +5,11 @@
 
 const NEWS = [
   {
-    v: '1.8',
-    items: ['\u{1F4DA} A shelf each for the books you\u2019re writing, the ones to continue later, the dropped ones and the finished ones. Move a book from its card'],
+    v: '1.9',
+    items: [
+      '\u{1F4DA} A shelf each for the books you\u2019re writing, the ones to improve, the ones to continue later, the dropped ones and the finished ones. Move a book from its card',
+      '\u{1F4D6} Books look more like books: the more words, the bigger the book',
+    ],
   },
   {
     v: '1.7',

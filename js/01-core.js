@@ -4,7 +4,7 @@
 //   • a tiny event system: emit('change') after any edit, other files listen with on('change', …)
 //   • the word log: how many words you wrote each day, the daily goal and the streak
 //   • small helpers ($, esc, today, …) and spineHTML(), which draws one book on the shelf
-const VERSION = '1.8';
+const VERSION = '1.9';
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 
@@ -12,6 +12,7 @@ const STATUS = {
   idea: { label: 'Idea', color: '#8fb7ff' },
   draft: { label: 'Drafting', color: '#ffc66b' },
   edit: { label: 'Editing', color: '#c9a0ff' },
+  improve: { label: 'To improve', color: '#ffb07a' },
   later: { label: 'Later', color: '#9fb4c8' },
   dropped: { label: 'Dropped', color: '#a8857a' },
   done: { label: 'Finished', color: '#7fe0a0' },
@@ -20,6 +21,7 @@ const STATUS = {
 // `status` is what a book gets when it's moved onto that shelf from the book card (05-book-card.js).
 const SHELVES = [
   { id: 'writing', name: 'Writing', holds: ['idea', 'draft', 'edit'], status: 'draft' },
+  { id: 'improve', name: 'To improve', holds: ['improve'], status: 'improve' },
   { id: 'later', name: 'To continue later', holds: ['later'], status: 'later' },
   { id: 'dropped', name: 'Dropped', holds: ['dropped'], status: 'dropped' },
   { id: 'done', name: 'Finished', holds: ['done'], status: 'done' },
@@ -139,11 +141,15 @@ function bestStreak() {
 
 /* ---------- Drawing a book ---------- */
 
-// A spine on the shelf: its colour fills up from the bottom as the book gets closer to its word goal
+// A spine on the shelf: its colour fills up from the bottom as the book gets closer to its word goal.
+// The more words in it, the thicker and taller the book (a short story is thin, a long novel is a big one).
 function spineHTML(b) {
+  const w = b.words || 0;
+  const thick = Math.round(36 + Math.min(18, w / 4000)); // 36 to 54px
+  const tall = Math.round(124 + Math.min(26, w / 3000)); // 124 to 150px
   return (
-    `<button class="spine ${b.status}" data-id="${esc(b.id)}" style="--c:${esc(b.color || SPINES[0])};--p:${pct(b)}%" aria-label="${esc(b.title)}">` +
-    `<b>${esc(b.title)}</b><i class="dot" style="--sc:${STATUS[b.status]?.color || '#888'}"></i></button>`
+    `<button class="spine ${b.status}" data-id="${esc(b.id)}" style="--c:${esc(b.color || SPINES[0])};--p:${pct(b)}%;width:${thick}px;height:${tall}px" aria-label="${esc(b.title)}">` +
+    `<i class="band top"></i><b>${esc(b.title)}</b><i class="band"></i><i class="dot" style="--sc:${STATUS[b.status]?.color || '#888'}"></i></button>`
   );
 }
 

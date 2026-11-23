@@ -169,15 +169,30 @@
 
 /* ---------- The shelf: rows of spines, a wooden board under each row ---------- */
 .shelf {
+  position: relative;
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
-  gap: 22px 5px;
+  gap: 22px 4px;
   margin: 26px 12px 30px;
-  padding: 0 12px 22px;
+  padding: 0 14px 22px;
   min-height: 172px;
-  /* every 172px: 150 of books, a 12px board, 10 of shadow */
-  background: repeating-linear-gradient(transparent 0 150px, #7a5532 150px 156px, #4f3520 156px 162px, #0006 162px 164px, transparent 164px 172px);
+  /* every 172px, a row: 150 of books, then the board (its top, its front edge with a light line, its shadow on
+     the wall), and under it at each end a wooden bracket holding it up */
+  background:
+    linear-gradient(transparent 164px, #3b2817 164px) left 22px top 0 / 12px 172px repeat-y,
+    linear-gradient(transparent 164px, #3b2817 164px) right 22px top 0 / 12px 172px repeat-y,
+    repeating-linear-gradient(
+      transparent 0 148px,
+      #a77a4a 148px 151px,
+      #8a5f36 151px 154px,
+      #c79a63 154px 155px,
+      #6b4627 155px 162px,
+      #4a301b 162px 164px,
+      #0007 164px 166px,
+      #0003 166px 170px,
+      transparent 170px 172px
+    );
 }
 /* the shelves, each with its name on a little brass plaque */
 .shelf-group {
@@ -213,38 +228,63 @@
   background: #c94f4f;
   clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 75%, 0 100%);
 }
+/* to improve: a little orange sticky note poking out the side, to remember there's fixing to do */
+.spine.improve::before {
+  content: '';
+  position: absolute;
+  top: 26px;
+  right: -5px;
+  width: 9px;
+  height: 14px;
+  border-radius: 1px;
+  background: #ffb07a;
+  box-shadow: 1px 1px 2px #0007;
+}
 /* dropped: faded and dusty */
 .spine.dropped {
   filter: grayscale(0.75) brightness(0.75);
 }
-/* a book: its colour fills up from the bottom (--p) as it gets closer to its word goal */
+/* a book: a leather-like spine with a soft curve; its colour fills up from the bottom (--p) as it gets closer
+   to its word goal. Its size comes from its number of words (spineHTML in 01-core.js). */
 .spine {
   position: relative;
-  width: 44px;
-  height: 150px;
-  border-radius: 3px 3px 1px 1px;
-  background: linear-gradient(to top, var(--c) var(--p), color-mix(in srgb, var(--c) 30%, #1c130b) var(--p));
+  margin-bottom: 2px;
+  border-radius: 4px 4px 2px 2px;
+  background:
+    linear-gradient(90deg, #0005, transparent 18%, #ffffff1a 32%, transparent 48%, transparent 78%, #0006),
+    linear-gradient(to top, var(--c) var(--p), color-mix(in srgb, var(--c) 35%, #1c130b) var(--p));
   box-shadow:
-    inset -5px 0 7px #0006,
-    inset 2px 0 0 #ffffff26,
-    inset 0 -3px 0 #0004;
+    inset 0 -3px 0 #0004,
+    2px 0 3px #0006;
   display: grid;
   place-items: center;
 }
-.spine:nth-child(3n) {
-  width: 50px;
+/* two thin gold lines near the top and the bottom, like a printed spine */
+.spine .band {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 22px;
+  height: 6px;
+  border-top: 1px solid #e6c37a99;
+  border-bottom: 1px solid #e6c37a99;
 }
-.spine:nth-child(4n + 1) {
-  width: 40px;
+.spine .band.top {
+  top: 10px;
+  bottom: auto;
 }
 .spine b {
   writing-mode: vertical-rl;
   transform: rotate(180deg);
-  max-height: 118px;
+  /* a long title wraps onto a second line on a thick book instead of being cut */
+  max-height: calc(100% - 46px);
+  max-width: calc(100% - 6px);
+  padding: 5px 2px;
+  border-radius: 2px;
+  background: #0000002e; /* a slightly darker label behind the title */
   overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  font: 13px var(--hd);
+  font: 12px/1.15 var(--hd);
+  text-align: center;
   color: #f6ead9;
   text-shadow: 0 1px 2px #000;
 }
@@ -257,13 +297,11 @@
   background: var(--sc);
   box-shadow: 0 0 6px var(--sc);
 }
-/* a finished book wears a gold band */
-.spine.done::after {
-  content: '';
-  position: absolute;
-  inset: 10px 0 auto;
-  height: 5px;
-  background: linear-gradient(90deg, #b8862b, #ffe08a, #b8862b);
+/* a finished book's lines are solid gold */
+.spine.done .band {
+  border-width: 2px;
+  border-color: #ffd36b;
+  box-shadow: 0 0 6px #ffd36b66;
 }
 .empty {
   width: 100%;

@@ -180,11 +180,11 @@ with sync_playwright() as p:
     pg.click('#btnInstall'); pg.wait_for_timeout(100)
     assert pg.evaluate('asked') == 1 and pg.is_hidden('#btnInstall')
     # --- the shelves: Writing, To continue later, Dropped, Finished; a book moves from its card
-    pg.evaluate("books.push({id: 'l1', title: 'Paused one', words: 10, status: 'later', added: 1}, {id: 'd1', title: 'Old idea', words: 5, status: 'dropped', added: 1}); save()")
-    assert pg.evaluate("[...$$('#shelf .shelf-group')].map(g => g.dataset.shelf + ':' + g.querySelectorAll('.spine').length)") == ['writing:1', 'later:1', 'dropped:1']
+    pg.evaluate("books.push({id: 'l1', title: 'Paused one', words: 10, status: 'later', added: 1}, {id: 'd1', title: 'Old idea', words: 5, status: 'dropped', added: 1}, {id: 'i1', title: 'Needs fixing', words: 50, status: 'improve', added: 1}); save()")
+    assert pg.evaluate("[...$$('#shelf .shelf-group')].map(g => g.dataset.shelf + ':' + g.querySelectorAll('.spine').length)") == ['writing:1', 'improve:1', 'later:1', 'dropped:1']
     pg.click('.spine[data-id="l1"]'); pg.click('.move [data-shelf="done"]'); pg.click('#dlgBook .x')
-    assert pg.evaluate("[byId('l1').status, [...$$('#shelf .shelf-group')].map(g => g.dataset.shelf).join()]") == ['done', 'writing,dropped,done']
-    pg.evaluate("books = books.filter(b => !['l1', 'd1'].includes(b.id)); save()")
+    assert pg.evaluate("[byId('l1').status, [...$$('#shelf .shelf-group')].map(g => g.dataset.shelf).join()]") == ['done', 'writing,improve,dropped,done']
+    pg.evaluate("books = books.filter(b => !['l1', 'd1', 'i1'].includes(b.id)); save()")
     # --- the room: light by time, seasons, storms, a decoration for each medal won
     assert pg.evaluate("[timeOfDay(new Date(2026, 0, 1, 23)), timeOfDay(new Date(2026, 0, 1, 12)), timeOfDay(new Date(2026, 0, 1, 7, 10))]") == ['night', 'day', 'dawn']
     assert pg.evaluate("[9, 11, 1, 3].map(m => SEASONS.find(s => s.when(m, 10))?.id)") == ['halloween', 'winter', 'valentine', None]
