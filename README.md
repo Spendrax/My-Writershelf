@@ -29,7 +29,7 @@ Live at https://spendrax.github.io/My-Writershelf/
 | `js/03-docs.js` | Picking Google Docs, reading their word counts (on open, on return, on ⟳) |
 | `js/04-book-form.js` | The add/edit form, removing a book |
 | `js/05-book-card.js` | The card shown when you tap a book, with its chapters (from the Doc's headings) |
-| `js/06-attic.js` | Today's note and the shelf |
+| `js/06-attic.js` | Today's note and the shelves (Writing, To continue later, Dropped, Finished: `SHELVES` in 01-core.js) |
 | `js/07-turning-walls.js` | Swiping round the hexagon: Goals ← Attic → Stats |
 | `js/08-buddy.js` | The buddy: drawing each animal (the `ANIMALS` list) and its hats (`HATS`), its moods, what it says |
 | `js/09-goals-stats.js` | The Goals wall and the Stats wall: medals (`MEDALS`, each wins a hat and a shelf decoration), the writing calendar |

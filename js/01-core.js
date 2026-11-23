@@ -4,7 +4,7 @@
 //   • a tiny event system: emit('change') after any edit, other files listen with on('change', …)
 //   • the word log: how many words you wrote each day, the daily goal and the streak
 //   • small helpers ($, esc, today, …) and spineHTML(), which draws one book on the shelf
-const VERSION = '1.7';
+const VERSION = '1.8';
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 
@@ -12,8 +12,19 @@ const STATUS = {
   idea: { label: 'Idea', color: '#8fb7ff' },
   draft: { label: 'Drafting', color: '#ffc66b' },
   edit: { label: 'Editing', color: '#c9a0ff' },
+  later: { label: 'Later', color: '#9fb4c8' },
+  dropped: { label: 'Dropped', color: '#a8857a' },
   done: { label: 'Finished', color: '#7fe0a0' },
 };
+// The attic's shelves, top to bottom, and the statuses each one holds (06-attic.js).
+// `status` is what a book gets when it's moved onto that shelf from the book card (05-book-card.js).
+const SHELVES = [
+  { id: 'writing', name: 'Writing', holds: ['idea', 'draft', 'edit'], status: 'draft' },
+  { id: 'later', name: 'To continue later', holds: ['later'], status: 'later' },
+  { id: 'dropped', name: 'Dropped', holds: ['dropped'], status: 'dropped' },
+  { id: 'done', name: 'Finished', holds: ['done'], status: 'done' },
+];
+const shelfOf = (b) => SHELVES.find((s) => s.holds.includes(b.status)) || SHELVES[0];
 const SPINES = ['#8c3b2e', '#2f5d50', '#34507d', '#7a5a2a', '#5e3a6e', '#3e3e44'];
 
 const load = (k, d) => {
@@ -131,7 +142,7 @@ function bestStreak() {
 // A spine on the shelf: its colour fills up from the bottom as the book gets closer to its word goal
 function spineHTML(b) {
   return (
-    `<button class="spine${b.status === 'done' ? ' done' : ''}" data-id="${esc(b.id)}" style="--c:${esc(b.color || SPINES[0])};--p:${pct(b)}%" aria-label="${esc(b.title)}">` +
+    `<button class="spine ${b.status}" data-id="${esc(b.id)}" style="--c:${esc(b.color || SPINES[0])};--p:${pct(b)}%" aria-label="${esc(b.title)}">` +
     `<b>${esc(b.title)}</b><i class="dot" style="--sc:${STATUS[b.status]?.color || '#888'}"></i></button>`
   );
 }

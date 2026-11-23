@@ -157,14 +157,14 @@ function drawSeason() {
 }
 
 /* ---------- Medal decorations on the shelf ---------- */
-// They stand on the shelf after the books; tap one to see which medal won it
+// They stand on the first shelf after its books; tap one to see which medal won it
 
 function drawTrinkets() {
   const won = MEDALS.reduce(
     (h, m) => (hasMedal(m) ? h + `<button class="trinket" data-m="${m.id}" aria-label="${m.decoName}">${m.deco}</button>` : h),
     '',
   );
-  $('#shelf').insertAdjacentHTML('beforeend', won);
+  $('#shelf .shelf')?.insertAdjacentHTML('beforeend', won); // on the first shelf
 }
 $('#shelf').addEventListener('click', (e) => {
   const t = e.target.closest('.trinket');

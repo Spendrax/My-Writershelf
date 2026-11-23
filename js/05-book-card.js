@@ -14,6 +14,8 @@ function openBook(id) {
     <p class="bwords"><b>${num(b.words)}</b> <span class="dim">${b.target ? `/ ${num(b.target)} words` : 'words'}</span></p>
     ${b.target ? `<div class="meter"><i style="width:${pct(b)}%"></i></div><p class="dim small">${left ? `${pct(b)}% · ${num(left)} words left` : 'Word goal reached!'}</p>` : ''}
     ${b.notes ? `<p class="notes">${esc(b.notes)}</p>` : ''}
+    <p class="dim small move-h">Move to</p>
+    <div class="seg move">${SHELVES.reduce((h, s) => h + `<button data-shelf="${s.id}"${shelfOf(b) === s ? ' class="on"' : ''}>${s.name}</button>`, '')}</div>
     ${
       b.doc
         ? `<button class="btn primary wide" data-do="write">📖 Open and write</button>
@@ -67,6 +69,15 @@ async function drawChapters(b) {
 $('#bBody').onclick = async (e) => {
   const what = e.target.closest('[data-do]')?.dataset.do;
   const b = byId($('#bBody').dataset.id);
+  // Move to another shelf
+  const to = SHELVES.find((s) => s.id === e.target.closest('[data-shelf]')?.dataset.shelf);
+  if (to && b && shelfOf(b) !== to) {
+    b.status = to.status;
+    b.updated = Date.now();
+    save();
+    toast(`Moved to ${to.name}`);
+    return openBook(b.id);
+  }
   const chap = e.target.closest('.chap');
   if (chap && b) {
     $('#dlgBook').close();

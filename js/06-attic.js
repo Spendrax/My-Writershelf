@@ -14,13 +14,20 @@ function drawToday() {
     ${books.some((b) => b.doc) ? '<button class="resync" id="resync" aria-label="Read the word count again">⟳</button>' : ''}`;
 }
 
-// Books still being written first, finished ones at the end; inside each, the last one touched first
+// One shelf for each of SHELVES (01-core.js), each with its name on a plaque; inside, the book touched last
+// comes first. The Writing shelf is always there; the others only once they hold a book.
 function drawShelf() {
-  const order = (b) => (b.status === 'done' ? 1 : 0);
-  const list = books.slice().sort((a, b) => order(a) - order(b) || (b.updated || b.added) - (a.updated || a.added));
-  $('#shelf').innerHTML = list.length
-    ? list.reduce((h, b) => h + spineHTML(b), '')
-    : '<p class="empty">Your shelf is empty.<br>Tap + to add the book you’re writing.</p>';
+  if (!books.length) return ($('#shelf').innerHTML = '<p class="empty">Your shelf is empty.<br>Tap + to add the book you’re writing.</p>');
+  const recent = books.slice().sort((a, b) => (b.updated || b.added) - (a.updated || a.added));
+  $('#shelf').innerHTML = SHELVES.reduce((h, shelf) => {
+    const spines = recent.reduce((s, b) => (shelfOf(b) === shelf ? s + spineHTML(b) : s), '');
+    if (!spines && shelf.id !== 'writing') return h;
+    return (
+      h +
+      `<section class="shelf-group" data-shelf="${shelf.id}"><h3 class="plaque">${shelf.name}</h3>` +
+      `<div class="shelf">${spines || '<p class="empty small">Nothing being written right now</p>'}</div></section>`
+    );
+  }, '');
 }
 
 $('#todayNote').onclick = (e) => e.target.id === 'resync' && refreshAll(true);

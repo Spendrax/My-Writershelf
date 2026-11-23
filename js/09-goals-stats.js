@@ -19,7 +19,7 @@ function drawGoals() {
   const n = wroteToday();
   const week = lastDays(7);
   const open = books.reduce((h, b) => {
-    if (b.status === 'done' || !b.target) return h;
+    if (!['writing', 'later'].includes(shelfOf(b).id) || !b.target) return h; // not the finished or dropped ones
     return h + `<div class="bar"><span class="bt">${esc(b.title)}</span><div><i style="width:${pct(b)}%"></i></div><span>${pct(b)}%</span></div>`;
   }, '');
   $('#goalsBody').innerHTML = `

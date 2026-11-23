@@ -391,3 +391,12 @@ label.check {
 label.check input {
   width: auto;
 }
+
+/* ---------- Book card: move to another shelf ---------- */
+.move-h {
+  margin: 12px 0 4px;
+}
+.seg.move {
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}

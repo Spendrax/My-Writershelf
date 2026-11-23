@@ -5,6 +5,10 @@
 
 const NEWS = [
   {
+    v: '1.8',
+    items: ['\u{1F4DA} A shelf each for the books you\u2019re writing, the ones to continue later, the dropped ones and the finished ones. Move a book from its card'],
+  },
+  {
     v: '1.7',
     items: [
       '\u{1F4C5} Words you write in Google Docs now count for the day you wrote them, even if you open the app later',

@@ -98,7 +98,7 @@ on('view', () => busy() || restPet(1500 + Math.random() * 2500));
 /* ---------- Landing on things ---------- */
 // The tops of things it can stand on, on the wall it's on, measured on the screen: { top, left, right, on }
 // `on` names it: 'thing0', 'thing1'… (today's note, the cards, in page order; cards are redrawn often, so
-// they're named by their place, not kept as elements), or 'board0', 'board1'… for the shelf's boards
+// they're named by their place, not kept as elements), or 'board0-0', 'board0-1'… for the shelves' boards
 
 function surfaces() {
   const wall = floorOf(where.wall).closest('.view');
@@ -106,13 +106,13 @@ function surfaces() {
     const r = el.getBoundingClientRect();
     return list.concat({ top: r.top, left: r.left, right: r.right, on: 'thing' + i });
   }, []);
-  // the shelf's boards: one under each row of books (every 172px, see .shelf in css/attic.css)
-  const shelf = $('.shelf', wall);
-  if (!shelf) return tops;
-  const s = shelf.getBoundingClientRect();
-  for (let top = s.top + 150, n = 0; top < s.bottom - 10; top += 172, n++)
-    tops.push({ top, left: s.left + 12, right: s.right - 12, on: 'board' + n });
-  return tops;
+  // the shelves' boards: one under each row of books (every 172px, see .shelf in css/attic.css)
+  return $$('.shelf', wall).reduce((list, shelf, k) => {
+    const s = shelf.getBoundingClientRect();
+    for (let top = s.top + 150, n = 0; top < s.bottom - 10; top += 172, n++)
+      list.push({ top, left: s.left + 12, right: s.right - 12, on: `board${k}-${n}` });
+    return list;
+  }, tops);
 }
 
 // Picks something on its wall it can reach (not too high, in view, wide enough), walks under it and jumps up.
@@ -173,7 +173,7 @@ function keepFooting() {
   moveTo(where.x, where.y, 0);
 }
 const footing = new ResizeObserver(() => keepFooting());
-$$('.view, .shelf').forEach((el) => footing.observe(el));
+$$('.view, #shelf').forEach((el) => footing.observe(el));
 on('change', () => setTimeout(keepFooting, 50)); // the cards were redrawn
 
 /* ---------- Picking it up ---------- */
