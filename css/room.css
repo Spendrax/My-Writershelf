@@ -17,6 +17,9 @@
   pointer-events: none;
   background: linear-gradient(200deg, #fff3c455, #fff3c411 60%, transparent);
   clip-path: polygon(calc(100% - 32px) 0, 100% 0, 45% 100%, 0 92%);
+  /* the light fades away as it spreads, instead of stopping at a straight edge */
+  -webkit-mask-image: linear-gradient(200deg, #000 25%, transparent 78%);
+  mask-image: linear-gradient(200deg, #000 25%, transparent 78%);
   opacity: 0;
   transition: opacity 3s;
 }
