@@ -259,7 +259,7 @@
 /* the kibble, heaped above the rim once it's filled */
 .bowl .food {
   transform: scaleY(0);
-  transform-origin: 50% 9px;
+  transform-origin: 50% 11px;
   transition: transform 0.3s;
 }
 .bowl.full .food {
