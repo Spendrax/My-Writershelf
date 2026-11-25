@@ -312,12 +312,26 @@ dialog.write[open] {
   margin: 1em 0;
   border-top: 1px dashed var(--line);
 }
+/* the paragraph you're changing: just a soft highlight, no box */
 #wDoc p[contenteditable] {
-  outline: 1px dashed var(--line);
-  background: #ffffff08;
+  outline: none;
+  background: #ffffff0a;
+  border-radius: 3px;
 }
+/* a changed paragraph, not saved yet: a thin line in the margin beside it */
 #wDoc p.edited {
-  box-shadow: -4px 0 0 var(--led);
+  position: relative;
+}
+#wDoc p.edited::before {
+  content: '';
+  position: absolute;
+  left: -8px;
+  top: 0.25em;
+  bottom: 0.25em;
+  width: 2px;
+  border-radius: 1px;
+  background: var(--led);
+  opacity: 0.7;
 }
 #wText {
   flex: 2 1 120px;

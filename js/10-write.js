@@ -164,7 +164,10 @@ $('#wDoc').onclick = (e) => {
   if (!p || p.isContentEditable) return;
   if (writing.paras[p.dataset.i].fixed) return toast('Pictures and tables can only be changed in Google Docs');
   p.contentEditable = 'plaintext-only';
+  p.spellcheck = false; // no dotted lines under words
   p.focus();
+  // done with it: back to plain text
+  p.addEventListener('blur', () => p.removeAttribute('contenteditable'), { once: true });
 };
 $('#wDoc').oninput = (e) => {
   const p = e.target.closest('p[data-i]');
