@@ -26,13 +26,14 @@ pet.onclick = () => {
   if (petting?.done) return (petting = null); // the end of a hold, not a tap
   const now = Date.now();
   heart();
+  if (pet.classList.contains('spin')) return; // mid-spin: more taps only add hearts, the spin finishes
   if (now - lastTap < 350) {
-    // two taps: a happy spin
-    pet.classList.remove('spin');
-    void pet.offsetWidth;
+    // two taps: a happy spin, played to the end (taps during it don't restart or cut it)
     pet.classList.add('spin');
-    setTimeout(() => pet.classList.remove('spin'), 700);
+    $('.pv', pet).addEventListener('animationend', () => pet.classList.remove('spin'), { once: true });
     say('🎉 Wheee!', 1800);
+    lastTap = 0; // the next spin needs two new taps
+    return;
   } else {
     say(buddyLine());
     petted();
