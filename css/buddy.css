@@ -60,11 +60,31 @@
   transform-box: fill-box;
 }
 .pet .top {
-  animation: breathe 2.6s ease-in-out infinite;
+  animation: breathe 3.2s ease-in-out infinite;
 }
 @keyframes breathe {
   50% {
-    transform: translateY(0.7px);
+    transform: translateY(0.6px);
+  }
+}
+/* the head turns at the neck; when nothing else is going on, it slowly looks around */
+.pet .head {
+  transform-box: view-box;
+  transform-origin: 40px 31px;
+  animation: look 7s ease-in-out infinite;
+}
+@keyframes look {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  20%,
+  35% {
+    transform: rotate(-5deg);
+  }
+  60%,
+  75% {
+    transform: rotate(4deg) translateY(0.5px);
   }
 }
 .pet .tail {
@@ -96,21 +116,38 @@
   transform-origin: 50% 0;
 }
 .pet.walk .leg.a {
-  animation: step 0.3s linear infinite alternate;
+  animation: step 0.36s ease-in-out infinite alternate;
 }
 .pet.walk .leg.b {
-  animation: step 0.3s linear infinite alternate-reverse;
+  animation: step 0.36s ease-in-out infinite alternate-reverse;
 }
 @keyframes step {
   from {
-    transform: rotate(-24deg);
+    transform: rotate(-22deg);
   }
   to {
-    transform: rotate(24deg);
+    transform: rotate(22deg);
   }
 }
+/* a little bounce at each step (twice per leg swing), the head nodding along, the tail swaying */
 .pet.walk .top {
-  animation-duration: 0.3s;
+  animation: bob 0.36s ease-in-out infinite;
+}
+@keyframes bob {
+  50% {
+    transform: translateY(-1.3px);
+  }
+}
+.pet.walk .head {
+  animation: nod 0.72s ease-in-out infinite;
+}
+@keyframes nod {
+  50% {
+    transform: rotate(3deg);
+  }
+}
+.pet.walk .tail {
+  animation: wag 0.72s ease-in-out infinite alternate;
 }
 
 /* ---------- Moods: the mouth and eyes change ---------- */
@@ -200,6 +237,12 @@
 .pet.petted .top {
   animation: purr 0.18s ease-in-out infinite alternate;
 }
+/* leaning into your hand */
+.pet.petted .head {
+  animation: none;
+  transform: rotate(-9deg);
+  transition: transform 0.4s ease-out;
+}
 @keyframes purr {
   to {
     transform: translateY(0.8px) scaleY(0.98);
@@ -222,14 +265,48 @@
   }
 }
 
-/* eating: head down into the bowl, again and again */
+/* eating: the body leans in a little; the head dips into the bowl, chews a few times, comes up, dips again */
 .pet.eat .top {
-  animation: nom 0.35s ease-in-out infinite alternate;
+  transform-box: view-box;
+  transform-origin: 20px 52px;
+  animation: lean 1.6s ease-in-out infinite;
+}
+@keyframes lean {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  30%,
+  80% {
+    transform: rotate(3deg);
+  }
+}
+.pet.eat .head {
+  animation: nom 1.6s ease-in-out infinite;
 }
 @keyframes nom {
-  to {
-    transform: translate(2px, 3px) rotate(6deg);
+  0%,
+  100% {
+    transform: rotate(0);
   }
+  30% {
+    transform: rotate(30deg) translate(2px, 2px);
+  }
+  42% {
+    transform: rotate(26deg) translate(2px, 1px);
+  }
+  54% {
+    transform: rotate(30deg) translate(2px, 2px);
+  }
+  66% {
+    transform: rotate(26deg) translate(2px, 1px);
+  }
+  80% {
+    transform: rotate(30deg) translate(2px, 2px);
+  }
+}
+.pet.eat .tail {
+  animation: wag 0.5s ease-in-out infinite alternate;
 }
 
 /* ---------- The food bowl on each floor: tap it to fill it and call your buddy (16-buddy-moves.js) ---------- */
@@ -335,13 +412,13 @@
 .pet.yawn .eyes {
   display: none;
 }
-.pet.yawn .top {
+.pet.yawn .head {
   animation: yawn 1.8s ease-in-out;
 }
 @keyframes yawn {
   40%,
   70% {
-    transform: translateY(-1.5px) rotate(-4deg);
+    transform: rotate(-12deg);
   }
 }
 /* stretching: long and low, front legs out */
@@ -365,13 +442,25 @@
     transform: rotate(-40deg);
   }
 }
-/* grooming: the head bobs down and up */
-.pet.groom .top {
-  animation: groom 0.4s ease-in-out 5 alternate;
+/* grooming: the head turns down to its chest and licks, lick, lick */
+.pet.groom .head {
+  animation: groom 2.2s ease-in-out;
 }
 @keyframes groom {
-  to {
-    transform: rotate(5deg) translateY(1.5px);
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  20%,
+  80% {
+    transform: rotate(22deg) translate(-3px, 2px);
+  }
+  35%,
+  65% {
+    transform: rotate(18deg) translate(-3px, 1px);
+  }
+  50% {
+    transform: rotate(23deg) translate(-3px, 2px);
   }
 }
 /* rolling over */

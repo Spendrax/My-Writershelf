@@ -104,7 +104,8 @@ const HATS = {
 const leg = (x, group, far) =>
   `<g class="leg ${group}"><rect class="${far ? 'f2' : 'f'}" x="${x}" y="38" width="6.5" height="14" rx="3.2"/><ellipse class="fl" cx="${x + 3.6}" cy="51.5" rx="3.7" ry="2"/></g>`;
 
-// The whole animal, facing right, with its hat (or none)
+// The whole animal, facing right, with its hat (or none). The head (ears, face, hat) is its own group that
+// turns at the neck, so it can look around, dip into the bowl or nod while the body keeps still.
 function petSVG(kind, hat) {
   const a = ANIMALS[kind] || ANIMALS.cat;
   return `<svg viewBox="0 -10 64 66" aria-hidden="true">
@@ -115,6 +116,7 @@ function petSVG(kind, hat) {
       <ellipse class="f" cx="28" cy="35" rx="17" ry="11"/>
       <ellipse class="fl" cx="29" cy="41" rx="11" ry="4.5"/>
       ${leg(19, 'a')}${leg(38, 'b')}
+      <g class="head">
       ${a.back || ''}
       <circle class="f" cx="46" cy="21" r="13"/>
       ${a.front || ''}
@@ -127,6 +129,7 @@ function petSVG(kind, hat) {
       <path class="frown line" d="M44 29q2.3-2 4.6 0"/>
       <ellipse class="yawnm" cx="46.3" cy="28.6" rx="2.3" ry="3.2" fill="#7a2b28"/>
       <g class="hat">${HATS[hat]?.svg || ''}</g>
+      </g>
     </g>
   </svg>`;
 }
