@@ -11,6 +11,11 @@
   z-index: 5;
   cursor: grab;
   touch-action: none; /* dragging it doesn't scroll the wall */
+  /* holding a finger on it pets it: it doesn't select the hearts or its words, nor open the phone's menu */
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
   /* moved along the floor, and carried by your finger, by 16-buddy-moves.js with transform: translate(…) */
 }
 /* .pv turns the buddy to face the way it walks (the bubble stays readable) */
