@@ -14,12 +14,13 @@
 
 let writing = null; // { b: the book, rev: the Doc's version, paras: [{ start, end, text, h, fixed }] }
 const draftKey = (b) => 'ws.draft.' + b.id;
-// what's waiting to be saved: { rev, edits: { paragraph number: new text }, more: text for the end }
+// what's waiting to be saved: { rev, edits: { paragraph number: new text }, gone: { paragraph number: true } (empty
+// lines you removed), more: text for the end }
 function loadDraft(b) {
   const d = load(draftKey(b), null);
-  if (d && typeof d === 'object') return { rev: '', edits: {}, more: '', ...d };
+  if (d && typeof d === 'object') return { rev: '', edits: {}, gone: {}, more: '', ...d };
   // before version 1.5 only the text for the end was kept, as plain text
-  return { rev: '', edits: {}, more: localStorage.getItem(draftKey(b)) || '' };
+  return { rev: '', edits: {}, gone: {}, more: localStorage.getItem(draftKey(b)) || '' };
 }
 
 /* ---------- Reading the Doc ---------- */
@@ -102,16 +103,17 @@ function keepDraft(draft) {
   store(draftKey(writing.b), draft);
 }
 
-const docText = (w, edits) => w.paras.reduce((t, p, i) => t + (edits[i] ?? p.text) + '\n', '');
+const docText = (w, d) => w.paras.reduce((t, p, i) => (d.gone[i] ? t : t + (d.edits[i] ?? p.text) + '\n'), '');
 
 /* ---------- The sheet ---------- */
 
 // Empty lines after your last line aren't shown, so the Doc ends where your writing ends
 function drawDoc() {
-  const edits = loadDraft(writing.b).edits;
+  const { edits, gone } = loadDraft(writing.b);
   const shown = (p, i) => (edits[i] ?? p.text).replace(/\v/g, '').trim() || p.pic || p.fixed;
   const last = writing.paras.reduce((n, p, i) => (shown(p, i) ? i : n), -1);
   $('#wDoc').innerHTML = writing.paras.slice(0, last + 1).reduce((h, p, i) => {
+    if (gone[i]) return h; // an empty line you removed
     const text = edits[i] ?? p.text;
     const kind = [p.h && 'h', p.brk && 'brk', p.fixed && 'fixed', !text.replace(/\v/g, '').trim() && !p.pic && 'blank', edits[i] != null && 'edited'];
     const shows = p.brk ? '' : (edits[i] != null ? showText(text) : p.html) || '<br>';
@@ -121,9 +123,9 @@ function drawDoc() {
 
 function drawCount() {
   const draft = loadDraft(writing.b);
-  const total = countWords(docText(writing, draft.edits) + draft.more);
+  const total = countWords(docText(writing, draft) + draft.more);
   const today = wroteToday() + Math.max(0, total - (writing.b.words || 0));
-  const waiting = draft.more.trim() || Object.keys(draft.edits).length;
+  const waiting = draft.more.trim() || Object.keys(draft.edits).length || Object.keys(draft.gone).length;
   $('#wCount').textContent = `${num(total)} words in the book · ${num(today)} / ${num(set.goal)} today`;
   $('#wSend').disabled = !waiting;
   emit('writing', total); // the buddy peeking in cheers you on (22-buddy-life.js)
@@ -176,9 +178,30 @@ $('#wDoc').oninput = (e) => {
   if (text === writing.paras[i].text) delete draft.edits[i];
   else draft.edits[i] = text;
   p.classList.toggle('edited', draft.edits[i] != null);
+  p.classList.toggle('blank', !text.trim()); // a line you write in grows to fit, instead of running over the next one
   keepDraft(draft);
   drawCount();
 };
+
+// Delete on an empty line removes it, and the cursor goes to the end of the line above (like in Google Docs)
+$('#wDoc').addEventListener('beforeinput', (e) => {
+  const p = e.target.closest?.('p[data-i]');
+  if (e.inputType !== 'deleteContentBackward' || !p || p.innerText.replace(/\s/g, '')) return;
+  e.preventDefault();
+  const draft = loadDraft(writing.b);
+  delete draft.edits[p.dataset.i];
+  draft.gone[p.dataset.i] = true;
+  keepDraft(draft);
+  const above = p.previousElementSibling;
+  p.remove();
+  drawCount();
+  if (!above || writing.paras[above.dataset.i].fixed) return;
+  above.contentEditable = 'plaintext-only';
+  above.focus();
+  getSelection().selectAllChildren(above);
+  getSelection().collapseToEnd();
+  above.addEventListener('blur', () => above.removeAttribute('contenteditable'), { once: true });
+});
 
 // A picture whose address stopped working (after about 30 minutes): a note instead
 $('#wDoc').addEventListener(
@@ -196,17 +219,22 @@ $('#wText').oninput = () => {
 
 /* ---------- Saving ---------- */
 
-// One list of changes for Google: the new text at the end first, then the changed paragraphs from the last to
-// the first, so each change leaves the positions of the ones still to come as they were
+// One list of changes for Google: the new text at the end first, then the changed and removed paragraphs from
+// the last to the first, so each change leaves the positions of the ones still to come as they were
 function saveRequests(draft) {
   const more = draft.more.trim() ? [{ insertText: { endOfSegmentLocation: {}, text: '\n' + draft.more.trim() } }] : [];
-  return Object.keys(draft.edits)
+  return Object.keys({ ...draft.edits, ...draft.gone })
     .map(Number)
     .sort((a, b) => b - a)
     .reduce((list, i) => {
       const p = writing.paras[i];
       const text = draft.edits[i];
       if (!p || p.fixed) return list;
+      // a removed line: it goes with the line break before it (the first line, with the one after it)
+      if (draft.gone[i]) {
+        const range = p.start > 1 ? { startIndex: p.start - 1, endIndex: p.end - 1 } : { startIndex: p.start, endIndex: p.end };
+        return list.concat({ deleteContentRange: { range } });
+      }
       const cut = p.text ? [{ deleteContentRange: { range: { startIndex: p.start, endIndex: p.end - 1 } } }] : [];
       const put = text ? [{ insertText: { location: { index: p.start }, text } }] : [];
       return list.concat(cut, put);

@@ -261,6 +261,13 @@ with sync_playwright() as p:
     assert doc['paras'] == ['Chapter One', ' '.join(['word'] * 148) + ' again', 'three more words'], doc['paras']
     assert pg.evaluate("localStorage.getItem('ws.draft.b1')") is None
     assert pg.evaluate('[byId("b1").words, wroteToday()]') == [154, 54]
+    # an empty line removed with Delete: gone from the Doc when saved
+    doc['paras'].insert(1, ''); doc['rev'] = 'r-blank'
+    pg.click('#dlgWrite [data-close]'); pg.click('.spine[data-id="b1"]'); pg.click('[data-do=write]'); pg.wait_for_timeout(600)
+    pg.click('#wDoc p[data-i="1"]'); pg.keyboard.press('Backspace'); pg.wait_for_timeout(100)
+    assert pg.evaluate("[!$('#wDoc p[data-i=\"1\"]'), load('ws.draft.b1').gone[1], document.activeElement.dataset.i]") == [True, True, '0']
+    pg.click('#wSend'); pg.wait_for_timeout(800)
+    assert doc['paras'][:2] == ['Chapter One', ' '.join(['word'] * 148) + ' again'], doc['paras'][:3]
     # changed in Google Docs meanwhile: nothing is overwritten, your change is kept to save again
     pg.click('#wDoc p[data-i="0"]')
     pg.evaluate("(p => { p.innerText = 'Chapter 1'; p.dispatchEvent(new Event('input', {bubbles: true})) })($('#wDoc p[data-i=\"0\"]'))")
