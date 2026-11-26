@@ -4,7 +4,7 @@
 //   • a tiny event system: emit('change') after any edit, other files listen with on('change', …)
 //   • the word log: how many words you wrote each day, the daily goal and the streak
 //   • small helpers ($, esc, today, …) and spineHTML(), which draws one book on the shelf
-const VERSION = '1.10';
+const VERSION = '1.11';
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 

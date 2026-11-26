@@ -298,6 +298,9 @@ LANG.ht = {
     "Heading 2": "Tit 2",
     "Heading 3": "Tit 3",
     "Tap a paragraph first, then select words": "Touche yon paragraf anvan, epi chwazi mo yo",
+    "Text size": "Gwosè tèks",
+    "Size": "Gwosè",
+    "Font": "Polis",
   },
   tpl: {
     "Moved to {1}": "Deplase nan {1}",

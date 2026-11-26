@@ -418,6 +418,7 @@ label.check input {
 /* ---------- Formatting toolbar in Open and write (js/26-format.js) ---------- */
 .tools {
   display: flex;
+  flex-wrap: wrap;
   gap: 6px;
   margin-bottom: 8px;
 }
@@ -438,7 +439,7 @@ label.check input {
   color: #1c130b;
 }
 .tools select {
-  flex: 1;
+  flex: 1 1 28%;
   min-width: 0;
   height: 34px;
   padding: 0 8px;

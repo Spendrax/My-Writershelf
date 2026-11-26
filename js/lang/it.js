@@ -298,6 +298,9 @@ LANG.it = {
     "Heading 2": "Titolo 2",
     "Heading 3": "Titolo 3",
     "Tap a paragraph first, then select words": "Prima tocca un paragrafo, poi seleziona le parole",
+    "Text size": "Dimensione testo",
+    "Size": "Dimensione",
+    "Font": "Carattere",
   },
   tpl: {
     "Moved to {1}": "Spostato in {1}",

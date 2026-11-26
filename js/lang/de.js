@@ -298,6 +298,9 @@ LANG.de = {
     "Heading 2": "Überschrift 2",
     "Heading 3": "Überschrift 3",
     "Tap a paragraph first, then select words": "Tippe zuerst auf einen Absatz und markiere dann Wörter",
+    "Text size": "Textgröße",
+    "Size": "Größe",
+    "Font": "Schriftart",
   },
   tpl: {
     "Moved to {1}": "Verschoben nach {1}",

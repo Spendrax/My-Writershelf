@@ -298,6 +298,9 @@ LANG.fr = {
     "Heading 2": "Titre 2",
     "Heading 3": "Titre 3",
     "Tap a paragraph first, then select words": "Touche d’abord un paragraphe, puis sélectionne des mots",
+    "Text size": "Taille du texte",
+    "Size": "Taille",
+    "Font": "Police",
   },
   tpl: {
     "Moved to {1}": "Déplacé vers {1}",

@@ -5,6 +5,10 @@
 
 const NEWS = [
   {
+    v: '1.11',
+    items: ['\u{1F520} Text size and font: select words, then pick from the Size and Font menus above the text'],
+  },
+  {
     v: '1.10',
     items: [
       '\u{1F58B} Bold, italic, underline, strikethrough and headings, like in Google Docs: tap a paragraph, select words, use the buttons above the text',

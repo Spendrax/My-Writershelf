@@ -298,6 +298,9 @@ LANG.pt = {
     "Heading 2": "Título 2",
     "Heading 3": "Título 3",
     "Tap a paragraph first, then select words": "Primeiro toca num parágrafo e depois seleciona palavras",
+    "Text size": "Tamanho do texto",
+    "Size": "Tamanho",
+    "Font": "Tipo de letra",
   },
   tpl: {
     "Moved to {1}": "Movido para {1}",

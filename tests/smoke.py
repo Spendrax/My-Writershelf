@@ -289,9 +289,21 @@ with sync_playwright() as p:
     assert d['edits']['0'] == [{'t': 'Chapter', 'b': True}, {'t': ' 1'}] and d['styles']['0'] == 'HEADING_2', d
     pg.click('#wSend'); pg.wait_for_timeout(800)
     last = doc['sent'][-1]
-    assert {'updateTextStyle': {'range': {'startIndex': 1, 'endIndex': 8}, 'textStyle': {'bold': True, 'italic': False, 'underline': False, 'strikethrough': False}, 'fields': 'bold,italic,underline,strikethrough'}} in last
+    assert {'updateTextStyle': {'range': {'startIndex': 1, 'endIndex': 8}, 'textStyle': {'bold': True, 'italic': False, 'underline': False, 'strikethrough': False}, 'fields': 'bold,italic,underline,strikethrough,fontSize,weightedFontFamily'}} in last
     assert any(r.get('updateParagraphStyle', {}).get('paragraphStyle') == {'namedStyleType': 'HEADING_2'} for r in last)
     assert doc['paras'][0] == 'Chapter 1'
+    # text size and font: picked from the menus for the selected words
+    pg.wait_for_timeout(500); pg.click('#wDoc p[data-i="0"]')
+    pg.evaluate("(p => { const r = document.createRange(); r.setStart(p.firstChild, 0); r.setEnd(p.firstChild, 7); getSelection().removeAllRanges(); getSelection().addRange(r) })($('#wDoc p[data-i=\"0\"]'))")
+    pg.select_option('#wSize', '18')
+    pg.evaluate("(p => { const t = p.querySelector('font,span').firstChild; const r = document.createRange(); r.setStart(t, 0); r.setEnd(t, 7); getSelection().removeAllRanges(); getSelection().addRange(r) })($('#wDoc p[data-i=\"0\"]'))")
+    pg.select_option('#wFont', 'Lora')
+    d = pg.evaluate("load('ws.draft.b1')")
+    assert d['edits']['0'] == [{'t': 'Chapter', 'z': 18, 'f': 'Lora'}, {'t': ' 1'}], d
+    assert pg.evaluate("$('#wSize').value + '/' + $('#wFont').value") == '18/Lora'
+    pg.click('#wSend'); pg.wait_for_timeout(800)
+    sent = [r['updateTextStyle']['textStyle'] for r in doc['sent'][-1] if 'updateTextStyle' in r]
+    assert sent[0]['fontSize'] == {'magnitude': 18, 'unit': 'PT'} and sent[0]['weightedFontFamily'] == {'fontFamily': 'Lora'} and 'fontSize' not in sent[1], sent
     pg.click('#dlgWrite [data-close]')
     # the chapters on the book card, and opening the book at one
     pg.click('.spine'); pg.wait_for_selector('.chap')
