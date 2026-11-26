@@ -5,6 +5,12 @@
 
 const NEWS = [
   {
+    v: '1.10',
+    items: [
+      '\u{1F58B} Bold, italic, underline, strikethrough and headings, like in Google Docs: tap a paragraph, select words, use the buttons above the text',
+    ],
+  },
+  {
     v: '1.9',
     items: [
       '\u{1F4DA} A shelf each for the books you\u2019re writing, the ones to improve, the ones to continue later, the dropped ones and the finished ones. Move a book from its card',

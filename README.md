@@ -48,6 +48,7 @@ Live at https://spendrax.github.io/My-Writershelf/
 | `js/23-sprint.js` | Writing sprints with the candle bar |
 | `js/24-prompts.js` | The idea of the day (`PROMPTS`) |
 | `js/25-reminder.js` | The daily reminder: subscribing, telling the helper, the notification's words |
+| `js/26-format.js` | Bold, italic, underline, strikethrough and headings in Open and write: reading them from the Doc, the toolbar, sending them back |
 | `js/15-languages.js`, `js/lang/` | The app in French, Spanish, Haitian Creole, Portuguese, German, Italian |
 | `tools/cloudflare-helper.js` | This app's own Cloudflare Worker: the Google sign-in, your rough position for the weather, earlier versions of a Doc |
 | `tools/reminders.js` | The daily reminders, sent by the Worker every 15 minutes (kept in the KV space "My writershelf reminders") |

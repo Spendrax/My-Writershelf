@@ -23,6 +23,8 @@ def apply_requests(body):
     for r in body['requests']:
         if 'deleteContentRange' in r:
             g = r['deleteContentRange']['range']; text = text[:g['startIndex'] - 1] + text[g['endIndex'] - 1:]
+        elif 'insertText' not in r:
+            continue  # looks and paragraph styles (checked on their own below)
         elif 'endOfSegmentLocation' in r['insertText']:
             text = text[:-1] + r['insertText']['text'] + '\n'
         else:
@@ -255,7 +257,7 @@ with sync_playwright() as p:
     pg.evaluate("(p => { p.innerText += ' again'; p.dispatchEvent(new Event('input', {bubbles: true})) })($('#wDoc p[data-i=\"1\"]'))")
     pg.fill('#wText', 'three more words'); pg.dispatch_event('#wText', 'input')
     draft = pg.evaluate("load('ws.draft.b1')")
-    assert draft['more'] == 'three more words' and draft['edits']['1'].endswith('word again'), 'kept on the phone while typing'
+    assert draft['more'] == 'three more words' and draft['edits']['1'][0]['t'].endswith('word again'), 'kept on the phone while typing'
     assert pg.inner_text('#wCount').startswith('154 words in the book · 54 / 500')
     pg.click('#wSend'); pg.wait_for_timeout(800)
     assert doc['paras'] == ['Chapter One', ' '.join(['word'] * 148) + ' again', 'three more words'], doc['paras']
@@ -272,13 +274,24 @@ with sync_playwright() as p:
     pg.click('#wDoc p[data-i="0"]')
     pg.evaluate("(p => { p.innerText = 'Chapter 1'; p.dispatchEvent(new Event('input', {bubbles: true})) })($('#wDoc p[data-i=\"0\"]'))")
     doc['rev'] = 'changed-elsewhere'; pg.click('#wSend'); pg.wait_for_timeout(800)
-    assert doc['paras'][0] == 'Chapter One' and pg.evaluate("load('ws.draft.b1').edits[0]") == 'Chapter 1'
+    assert doc['paras'][0] == 'Chapter One' and pg.evaluate("load('ws.draft.b1').edits[0][0].t") == 'Chapter 1'
     pg.click('#wSend'); pg.wait_for_timeout(800)
     assert doc['paras'][0] == 'Chapter 1' and pg.evaluate('byId("b1").words') == 154
     # while writing, your buddy peeks in and cheers each 100 words
     pg.fill('#wText', ' '.join(['more'] * 105)); pg.dispatch_event('#wText', 'input')
     assert pg.evaluate("$('#peek').classList.contains('talk') && $('#peek .bubble').textContent") == '🎉 +100 words!'
     pg.fill('#wText', ''); pg.dispatch_event('#wText', 'input')
+    # formatting: a bold word and a heading go to Google as their look and style
+    pg.click('#wDoc p[data-i="0"]')
+    pg.evaluate("(p => { const r = document.createRange(); r.setStart(p.firstChild, 0); r.setEnd(p.firstChild, 7); getSelection().removeAllRanges(); getSelection().addRange(r) })($('#wDoc p[data-i=\"0\"]'))")
+    pg.click('#wTools [data-look="bold"]'); pg.select_option('#wStyle', 'HEADING_2')
+    d = pg.evaluate("load('ws.draft.b1')")
+    assert d['edits']['0'] == [{'t': 'Chapter', 'b': True}, {'t': ' 1'}] and d['styles']['0'] == 'HEADING_2', d
+    pg.click('#wSend'); pg.wait_for_timeout(800)
+    last = doc['sent'][-1]
+    assert {'updateTextStyle': {'range': {'startIndex': 1, 'endIndex': 8}, 'textStyle': {'bold': True, 'italic': False, 'underline': False, 'strikethrough': False}, 'fields': 'bold,italic,underline,strikethrough'}} in last
+    assert any(r.get('updateParagraphStyle', {}).get('paragraphStyle') == {'namedStyleType': 'HEADING_2'} for r in last)
+    assert doc['paras'][0] == 'Chapter 1'
     pg.click('#dlgWrite [data-close]')
     # the chapters on the book card, and opening the book at one
     pg.click('.spine'); pg.wait_for_selector('.chap')

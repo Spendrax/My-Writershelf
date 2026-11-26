@@ -273,9 +273,9 @@ dialog.write[open] {
   margin: 0 0 0.7em;
   border-radius: 4px;
 }
+/* bigger, not bold: in Google Docs, bold is its own choice (the B button) */
 #wDoc p.h {
-  font-weight: 700;
-  font-size: 16px;
+  font-size: 19px;
 }
 #wDoc p.fixed {
   color: var(--dim);
@@ -413,4 +413,33 @@ label.check input {
 .seg.move {
   flex-wrap: wrap;
   margin-bottom: 8px;
+}
+
+/* ---------- Formatting toolbar in Open and write (js/26-format.js) ---------- */
+.tools {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.tools button {
+  width: 38px;
+  height: 34px;
+  border-radius: 8px;
+  background: #ffffff10;
+  color: var(--ink);
+  font: 16px Georgia, serif;
+}
+.tools .t-b { font-weight: 700; }
+.tools .t-i { font-style: italic; }
+.tools .t-u { text-decoration: underline; }
+.tools .t-s { text-decoration: line-through; }
+.tools button.on {
+  background: var(--led);
+  color: #1c130b;
+}
+.tools select {
+  flex: 1;
+  min-width: 0;
+  height: 34px;
+  padding: 0 8px;
 }

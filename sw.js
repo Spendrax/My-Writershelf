@@ -1,5 +1,5 @@
 // Offline copy. Bump V on every release.
-const V = 'ws-v32';
+const V = 'ws-v33';
 const SHELL = [
   './', 'index.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png',
   'css/base.css',
@@ -33,6 +33,7 @@ const SHELL = [
   'js/23-sprint.js',
   'js/24-prompts.js',
   'js/25-reminder.js',
+  'js/26-format.js',
   'js/lang/fr.js',
   'js/lang/es.js',
   'js/lang/ht.js',

@@ -9,18 +9,25 @@
 // If the Doc was changed somewhere else since you opened it, Google refuses the save (nothing is overwritten)
 // and the app opens the new version, keeping your changes so you can save them again.
 // Pictures show as they are, but a paragraph with a picture can only be changed in Google Docs.
-// shortcut: text is shown plain (headings stand out, bold/italics don't show), and bold or italics inside a
-// paragraph you change are lost in that paragraph. Upgrade: read and send the text styles too.
+// Bold, italic, underline, strikethrough and headings show as in Google Docs and can be changed (26-format.js).
+// shortcut: other looks (fonts, sizes, colours, links) aren't shown, and a paragraph you change keeps only the
+// looks above. Upgrade: read and send those too.
 
-let writing = null; // { b: the book, rev: the Doc's version, paras: [{ start, end, text, h, fixed }] }
+let writing = null; // { b: the book, rev: the Doc's version, paras: [{ start, end, text, runs, named, h, fixed }] }
 const draftKey = (b) => 'ws.draft.' + b.id;
-// what's waiting to be saved: { rev, edits: { paragraph number: new text }, gone: { paragraph number: true } (empty
-// lines you removed), more: text for the end }
+// what's waiting to be saved: { rev, edits: { paragraph number: its new runs (26-format.js) }, styles: { paragraph
+// number: its new style, like 'HEADING_1' }, gone: { paragraph number: true } (empty lines you removed),
+// more: text for the end }
 function loadDraft(b) {
   const d = load(draftKey(b), null);
-  if (d && typeof d === 'object') return { rev: '', edits: {}, gone: {}, more: '', ...d };
+  if (d && typeof d === 'object') {
+    const draft = { rev: '', edits: {}, styles: {}, gone: {}, more: '', ...d };
+    // before version 1.10, a changed paragraph was kept as plain text
+    Object.keys(draft.edits).forEach((i) => typeof draft.edits[i] === 'string' && (draft.edits[i] = [{ t: draft.edits[i] }]));
+    return draft;
+  }
   // before version 1.5 only the text for the end was kept, as plain text
-  return { rev: '', edits: {}, gone: {}, more: localStorage.getItem(draftKey(b)) || '' };
+  return { rev: '', edits: {}, styles: {}, gone: {}, more: localStorage.getItem(draftKey(b)) || '' };
 }
 
 /* ---------- Reading the Doc ---------- */
@@ -66,7 +73,7 @@ const showText = (t) =>
 
 // How each kind of thing in a paragraph shows
 function showPart(p, objects) {
-  if (p.textRun) return showText(p.textRun.content);
+  if (p.textRun) return runsHTML(runsOfDoc([p])); // with its bold, italic…
   if (p.inlineObjectElement) return picture(objects.inline[p.inlineObjectElement.inlineObjectId]?.inlineObjectProperties);
   if (p.horizontalRule) return '<hr>';
   if (p.footnoteReference) return `<sup>${esc(p.footnoteReference.footnoteNumber)}</sup>`;
@@ -87,6 +94,8 @@ function paraOf(el, objects) {
     start: el.startIndex,
     end: el.endIndex,
     text: parts.reduce((t, p) => t + (p.textRun?.content || ''), '').replace(/\n$/, ''),
+    runs: runsOfDoc(parts),
+    named: el.paragraph.paragraphStyle?.namedStyleType || 'NORMAL_TEXT',
     html,
     h: /HEADING|TITLE/.test(el.paragraph.paragraphStyle?.namedStyleType || ''),
     lvl: +(el.paragraph.paragraphStyle?.namedStyleType || '').replace(/\D/g, '') || 0, // 1 for Heading 1… (0 for the title)
@@ -103,20 +112,24 @@ function keepDraft(draft) {
   store(draftKey(writing.b), draft);
 }
 
-const docText = (w, d) => w.paras.reduce((t, p, i) => (d.gone[i] ? t : t + (d.edits[i] ?? p.text) + '\n'), '');
+const textOf = (p, i, d) => (d.edits[i] ? runsText(d.edits[i]) : p.text);
+const docText = (w, d) => w.paras.reduce((t, p, i) => (d.gone[i] ? t : t + textOf(p, i, d) + '\n'), '');
 
 /* ---------- The sheet ---------- */
 
 // Empty lines after your last line aren't shown, so the Doc ends where your writing ends
 function drawDoc() {
-  const { edits, gone } = loadDraft(writing.b);
-  const shown = (p, i) => (edits[i] ?? p.text).replace(/\v/g, '').trim() || p.pic || p.fixed;
+  const draft = loadDraft(writing.b);
+  const { edits, styles, gone } = draft;
+  const shown = (p, i) => textOf(p, i, draft).replace(/\v/g, '').trim() || p.pic || p.fixed;
   const last = writing.paras.reduce((n, p, i) => (shown(p, i) ? i : n), -1);
   $('#wDoc').innerHTML = writing.paras.slice(0, last + 1).reduce((h, p, i) => {
     if (gone[i]) return h; // an empty line you removed
-    const text = edits[i] ?? p.text;
-    const kind = [p.h && 'h', p.brk && 'brk', p.fixed && 'fixed', !text.replace(/\v/g, '').trim() && !p.pic && 'blank', edits[i] != null && 'edited'];
-    const shows = p.brk ? '' : (edits[i] != null ? showText(text) : p.html) || '<br>';
+    const text = textOf(p, i, draft);
+    const heading = styles[i] ? styles[i] !== 'NORMAL_TEXT' : p.h;
+    const changed = edits[i] || styles[i];
+    const kind = [heading && 'h', p.brk && 'brk', p.fixed && 'fixed', !text.replace(/\v/g, '').trim() && !p.pic && 'blank', changed && 'edited'];
+    const shows = p.brk ? '' : (edits[i] ? runsHTML(edits[i]) : p.html) || '<br>';
     return h + `<p data-i="${i}" class="${kind.filter(Boolean).join(' ')}">${shows}</p>`;
   }, '');
 }
@@ -125,7 +138,7 @@ function drawCount() {
   const draft = loadDraft(writing.b);
   const total = countWords(docText(writing, draft) + draft.more);
   const today = wroteToday() + Math.max(0, total - (writing.b.words || 0));
-  const waiting = draft.more.trim() || Object.keys(draft.edits).length || Object.keys(draft.gone).length;
+  const waiting = draft.more.trim() || [draft.edits, draft.styles, draft.gone].some((o) => Object.keys(o).length);
   $('#wCount').textContent = `${num(total)} words in the book · ${num(today)} / ${num(set.goal)} today`;
   $('#wSend').disabled = !waiting;
   emit('writing', total); // the buddy peeking in cheers you on (22-buddy-life.js)
@@ -165,19 +178,26 @@ $('#wDoc').onclick = (e) => {
   const p = e.target.closest('p[data-i]');
   if (!p || p.isContentEditable) return;
   if (writing.paras[p.dataset.i].fixed) return toast('Pictures and tables can only be changed in Google Docs');
-  p.contentEditable = 'plaintext-only';
-  p.focus();
-  // done with it: back to plain text
-  p.addEventListener('blur', () => p.removeAttribute('contenteditable'), { once: true });
+  editable(p);
 };
+
+// A paragraph you can type in (and format with the toolbar, 26-format.js) until you leave it
+function editable(p) {
+  p.contentEditable = 'true';
+  p.focus();
+  editingP = p;
+  drawTools();
+  p.addEventListener('blur', () => p.removeAttribute('contenteditable'), { once: true });
+}
 $('#wDoc').oninput = (e) => {
   const p = e.target.closest('p[data-i]');
   const draft = loadDraft(writing.b);
   const i = p.dataset.i;
-  const text = p.innerText.replace(/\n$/, '').replace(/\n/g, '\v'); // a new line here stays in this paragraph, like Shift+Enter
-  if (text === writing.paras[i].text) delete draft.edits[i];
-  else draft.edits[i] = text;
-  p.classList.toggle('edited', draft.edits[i] != null);
+  const runs = runsOfScreen(p);
+  const text = runsText(runs);
+  if (sameRuns(runs, writing.paras[i].runs)) delete draft.edits[i];
+  else draft.edits[i] = runs;
+  p.classList.toggle('edited', !!(draft.edits[i] || draft.styles[i]));
   p.classList.toggle('blank', !text.trim()); // a line you write in grows to fit, instead of running over the next one
   keepDraft(draft);
   drawCount();
@@ -186,21 +206,31 @@ $('#wDoc').oninput = (e) => {
 // Delete on an empty line removes it, and the cursor goes to the end of the line above (like in Google Docs)
 $('#wDoc').addEventListener('beforeinput', (e) => {
   const p = e.target.closest?.('p[data-i]');
+  // Enter: a new line inside this paragraph (like Shift+Enter in Google Docs)
+  if (e.inputType === 'insertParagraph' && p) {
+    e.preventDefault();
+    return document.execCommand('insertLineBreak');
+  }
   if (e.inputType !== 'deleteContentBackward' || !p || p.innerText.replace(/\s/g, '')) return;
   e.preventDefault();
   const draft = loadDraft(writing.b);
   delete draft.edits[p.dataset.i];
+  delete draft.styles[p.dataset.i];
   draft.gone[p.dataset.i] = true;
   keepDraft(draft);
   const above = p.previousElementSibling;
   p.remove();
   drawCount();
   if (!above || writing.paras[above.dataset.i].fixed) return;
-  above.contentEditable = 'plaintext-only';
-  above.focus();
+  editable(above);
   getSelection().selectAllChildren(above);
   getSelection().collapseToEnd();
-  above.addEventListener('blur', () => above.removeAttribute('contenteditable'), { once: true });
+});
+
+// Pasted text comes in plain (its look from elsewhere is left behind)
+$('#wDoc').addEventListener('paste', (e) => {
+  e.preventDefault();
+  document.execCommand('insertText', false, e.clipboardData.getData('text/plain'));
 });
 
 // A picture whose address stopped working (after about 30 minutes): a note instead
@@ -220,24 +250,30 @@ $('#wText').oninput = () => {
 /* ---------- Saving ---------- */
 
 // One list of changes for Google: the new text at the end first, then the changed and removed paragraphs from
-// the last to the first, so each change leaves the positions of the ones still to come as they were
+// the last to the first, so each change leaves the positions of the ones still to come as they were.
+// A changed paragraph: its old text out, its new text in, its style, then the look of each of its runs.
 function saveRequests(draft) {
   const more = draft.more.trim() ? [{ insertText: { endOfSegmentLocation: {}, text: '\n' + draft.more.trim() } }] : [];
-  return Object.keys({ ...draft.edits, ...draft.gone })
+  return Object.keys({ ...draft.edits, ...draft.styles, ...draft.gone })
     .map(Number)
     .sort((a, b) => b - a)
     .reduce((list, i) => {
       const p = writing.paras[i];
-      const text = draft.edits[i];
+      const runs = draft.edits[i];
+      const text = runs ? runsText(runs) : '';
       if (!p || p.fixed) return list;
       // a removed line: it goes with the line break before it (the first line, with the one after it)
       if (draft.gone[i]) {
         const range = p.start > 1 ? { startIndex: p.start - 1, endIndex: p.end - 1 } : { startIndex: p.start, endIndex: p.end };
         return list.concat({ deleteContentRange: { range } });
       }
-      const cut = p.text ? [{ deleteContentRange: { range: { startIndex: p.start, endIndex: p.end - 1 } } }] : [];
+      const cut = runs && p.text ? [{ deleteContentRange: { range: { startIndex: p.start, endIndex: p.end - 1 } } }] : [];
       const put = text ? [{ insertText: { location: { index: p.start }, text } }] : [];
-      return list.concat(cut, put);
+      const end = p.start + (runs ? text.length + 1 : p.end - p.start);
+      const style = draft.styles[i]
+        ? [{ updateParagraphStyle: { range: { startIndex: p.start, endIndex: end }, paragraphStyle: { namedStyleType: draft.styles[i] }, fields: 'namedStyleType' } }]
+        : [];
+      return list.concat(cut, put, style, runs ? runRequests(runs, p.start) : []);
     }, more);
 }
 

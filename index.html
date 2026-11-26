@@ -95,11 +95,12 @@
 <!-- Open and write: the whole Google Doc — tap a paragraph to change it, keep writing at the bottom (10-write.js) -->
 <dialog id="dlgWrite" class="sheet write">
   <div class="sheet-h"><h2 id="wTitle"></h2><div id="peek" class="peek" aria-hidden="true"><span class="bubble"></span><div class="pv"></div></div><button class="x" data-close aria-label="Close">✕</button></div>
+  <div id="wTools" class="tools" role="toolbar" aria-label="Formatting"></div>
   <div id="wDoc" class="ctx"></div>
   <textarea id="wText" rows="5" placeholder="Keep writing…"></textarea>
   <p class="dim small" id="wCount"></p>
   <button id="wSend" class="btn primary wide">Save to my Google Doc</button>
-  <p class="dim small">Tap a paragraph to change it. Until it’s saved, your writing is kept on this phone.</p>
+  <p class="dim small">Tap a paragraph to change it; select words to make them bold, italic… Until it’s saved, your writing is kept on this phone.</p>
 </dialog>
 
 <!-- Customize: a short sheet with no dark backdrop, so the attic stays in view while you choose -->
@@ -181,5 +182,6 @@
 <script src="js/23-sprint.js"></script>
 <script src="js/24-prompts.js"></script>
 <script src="js/25-reminder.js"></script>
+<script src="js/26-format.js"></script>
 </body>
 </html>
